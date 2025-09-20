@@ -29,16 +29,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(
-          'Menu Max',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-            color: Colors.white,
+        title: Center(
+          child: Image.asset(
+            'assets/images/menumaxlogo.png',
+            height: 40,
+            fit: BoxFit.contain,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
