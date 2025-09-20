@@ -31,20 +31,61 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  # UI and File handling
   cupertino_icons: ^1.0.8
+  file_picker: ^8.0.0+1
+  image_picker: ^1.0.4
+
+  # HTTP and API calls
+  http: ^1.1.0
+  dio: ^5.3.2
+
+  # PDF processing
+  pdf: ^3.10.4
+  printing: ^5.11.0
+  syncfusion_flutter_pdf: ^24.1.41
+
+  # Image processing
+  image: ^4.1.3
+
+  # OCR and text processing
+  google_ml_kit: ^0.16.3
+
+  # State management
+  provider: ^6.0.5
+
+  # Data models and serialization
+  json_annotation: ^4.8.1
+
+  # Charts and visualization
+  fl_chart: ^0.63.0
+
+  # String matching and fuzzy search
+  fuzzywuzzy: ^1.1.6
+
+  # Local storage
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.1
+
+  # Math and optimization
+  vector_math: ^2.1.4
+
+  # MongoDB integration
+  mongo_dart: ^0.10.5
+  crypto: ^3.0.3
+  uuid: ^4.1.0
+
+  # Gemini AI integration
+  google_generative_ai: ^0.2.2
+  camera: ^0.10.5+5
+  auth0_flutter: ^1.13.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  json_serializable: ^6.7.1
+  build_runner: ^2.4.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
