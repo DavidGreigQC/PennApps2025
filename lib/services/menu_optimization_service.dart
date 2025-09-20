@@ -159,8 +159,8 @@ class MenuOptimizationService extends ChangeNotifier {
 
   /// Helper method to determine if two menu items are the same
   bool _isSameMenuItem(MenuItem item1, MenuItem item2) {
-    // Primary check: exact name and price match
-    if (item1.name == item2.name && item1.price == item2.price) {
+    // Primary check: exact name match
+    if (item1.name == item2.name) {
       return true;
     }
 
@@ -168,8 +168,17 @@ class MenuOptimizationService extends ChangeNotifier {
     String normalizedName1 = _normalizeMenuItemName(item1.name);
     String normalizedName2 = _normalizeMenuItemName(item2.name);
 
-    // Names must match closely and prices must be exactly the same
-    return normalizedName1 == normalizedName2 && item1.price == item2.price;
+    // Names must match closely - allow price changes during enrichment
+    if (normalizedName1 == normalizedName2) {
+      // Allow price changes only if original price was 0.0 (missing price)
+      if (item1.price == 0.0 || item2.price == 0.0) {
+        return true;
+      }
+      // If both have non-zero prices, they must match
+      return item1.price == item2.price;
+    }
+
+    return false;
   }
 
   /// Normalizes menu item names for comparison

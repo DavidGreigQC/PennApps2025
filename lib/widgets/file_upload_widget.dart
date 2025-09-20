@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class FileUploadWidget extends StatefulWidget {
@@ -17,6 +18,7 @@ class FileUploadWidget extends StatefulWidget {
 class _FileUploadWidgetState extends State<FileUploadWidget> {
   List<String> _selectedFilesAndUrls = [];
   final TextEditingController _urlController = TextEditingController();
+  final ImagePicker _imagePicker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -26,25 +28,50 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // File picker
-            InkWell(
-              onTap: _pickFiles,
-              child: Container(
-                height: 150,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!, width: 2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.cloud_upload, size: 48),
-                    SizedBox(height: 8),
-                    Text('Tap to upload menu files'),
-                    SizedBox(height: 4),
-                    Text('PDF, PNG, JPG supported'),
-                  ],
-                ),
+            // Upload Options Header
+            Text(
+              'Choose Upload Method:',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Four upload option buttons
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 110,
+                    child: _buildUploadOption(
+                      icon: Icons.camera_alt,
+                      title: 'Camera',
+                      subtitle: 'Take Photo',
+                      onTap: _takePhoto,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  SizedBox(
+                    width: 110,
+                    child: _buildUploadOption(
+                      icon: Icons.photo_library,
+                      title: 'Photos',
+                      subtitle: 'Gallery',
+                      onTap: _pickFromGallery,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  SizedBox(
+                    width: 110,
+                    child: _buildUploadOption(
+                      icon: Icons.upload_file,
+                      title: 'Files',
+                      subtitle: 'PDF/Image',
+                      onTap: _pickFiles,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
@@ -72,14 +99,25 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
               const SizedBox(height: 8),
               ..._selectedFilesAndUrls.map((item) => _buildFileOrUrlItem(item)),
               const SizedBox(height: 8),
-              Row(
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: _pickFiles,
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add More Files'),
+                    onPressed: _takePhoto,
+                    icon: const Icon(Icons.camera_alt),
+                    label: const Text('Camera'),
                   ),
-                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    onPressed: _pickFromGallery,
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('Photos'),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: _pickFiles,
+                    icon: const Icon(Icons.upload_file),
+                    label: const Text('Files'),
+                  ),
                   TextButton.icon(
                     onPressed: _clearAll,
                     icon: const Icon(Icons.clear),
@@ -163,5 +201,94 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
       _selectedFilesAndUrls.clear();
     });
     widget.onFilesSelected(_selectedFilesAndUrls);
+  }
+
+  Widget _buildUploadOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        height: 100,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey[300]!, width: 2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 32, color: Theme.of(context).primaryColor),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickFromGallery() async {
+    try {
+      final List<XFile> images = await _imagePicker.pickMultiImage();
+
+      if (images.isNotEmpty) {
+        List<String> newFiles = images.map((image) => image.path).toList();
+
+        setState(() {
+          _selectedFilesAndUrls.addAll(newFiles);
+          _selectedFilesAndUrls = _selectedFilesAndUrls.toSet().toList();
+        });
+
+        widget.onFilesSelected(_selectedFilesAndUrls);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error selecting photos: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _takePhoto() async {
+    try {
+      final XFile? photo = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+      );
+
+      if (photo != null) {
+        setState(() {
+          _selectedFilesAndUrls.add(photo.path);
+          _selectedFilesAndUrls = _selectedFilesAndUrls.toSet().toList();
+        });
+
+        widget.onFilesSelected(_selectedFilesAndUrls);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error taking photo: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

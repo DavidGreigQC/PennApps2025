@@ -31,6 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            onPressed: () => Navigator.pushNamed(context, '/test-caching'),
+            tooltip: 'Test Data Caching',
+          ),
           if (_currentPage > 0)
             IconButton(
               icon: const Icon(Icons.refresh),

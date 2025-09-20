@@ -60,5 +60,9 @@
 	<array>
 		<string>webcredentials:dev-mup2ksku6p7ra6tr.us.auth0.com</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to camera to take photos of restaurant menus for optimization analysis.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to photo library to select menu images for optimization analysis.</string>
 </dict>
 </plist>

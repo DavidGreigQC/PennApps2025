@@ -131,6 +131,29 @@ class OCRService {
       }
     }
 
+    // Third pass: if no items found, extract items without prices (for menus that don't show prices)
+    if (items.isEmpty) {
+      print('NO PRICES FOUND: Extracting items without prices...');
+
+      // Smart parsing to combine related lines into full item names
+      List<String> potentialItems = _extractSmartMenuItems(lines);
+
+      for (String itemName in potentialItems) {
+        if (_isValidMenuItemWithoutPrice(itemName)) {
+          MenuItem item = MenuItem(
+            name: _cleanItemName(itemName),
+            price: 0.0, // Will be looked up online later
+            description: null,
+          );
+
+          if (!_isDuplicateByName(items, item.name)) {
+            items.add(item);
+            print('EXTRACTED (smart parsing): ${item.name}');
+          }
+        }
+      }
+    }
+
     List<MenuItem> deduplicated = _deduplicate(items);
     print('FINAL: ${deduplicated.length} unique menu items extracted');
     return deduplicated;
@@ -249,6 +272,159 @@ class OCRService {
     return items.any((item) =>
         item.name.toLowerCase() == name.toLowerCase() &&
         (item.price - price).abs() < 0.01);
+  }
+
+  bool _isDuplicateByName(List<MenuItem> items, String name) {
+    return items.any((item) => item.name.toLowerCase() == name.toLowerCase());
+  }
+
+  bool _isValidMenuItemWithoutPrice(String text) {
+    // More lenient validation for items without prices
+    if (text.length < 3) return false;
+
+    // Skip obvious non-menu text
+    List<String> skipWords = ['menu', 'size', 'cal', 'calories', 'nutrition', 'total', 'tax', 'subtotal', 'sign', 'in', 'new', 'dominos.com'];
+    String lowerText = text.toLowerCase();
+    for (String skip in skipWords) {
+      if (lowerText.contains(skip)) return false;
+    }
+
+    // Skip single words that are too short or common
+    if (text.split(' ').length == 1 && text.length < 4) return false;
+
+    // Skip if it's mostly numbers or symbols
+    if (RegExp(r'^[\d\s\.\:\-\%\$]+$').hasMatch(text)) return false;
+
+    // Must contain letters
+    if (!text.contains(RegExp(r'[a-zA-Z]{2,}'))) return false;
+
+    // Good indicators for Domino's style items
+    if (text.contains(RegExp(r'bread|pizza|cheese|stuffed|bites|garlic|parmesan|pepperoni|bacon|spinach|feta|cinnamon', caseSensitive: false))) return true;
+
+    // General food words
+    if (text.contains(RegExp(r'chicken|beef|sauce|dip|wing|salad|pasta|sandwich', caseSensitive: false))) return true;
+
+    // Starts with capital and has decent length
+    if (text.contains(RegExp(r'^[A-Z][a-z]')) && text.length > 5) return true;
+
+    return false;
+  }
+
+  List<String> _extractSmartMenuItems(List<String> lines) {
+    List<String> menuItems = [];
+    print('SMART PARSING: Processing ${lines.length} lines...');
+
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i].trim();
+      if (line.isEmpty || line.length < 3) continue;
+
+      // Look for lines that start menu items (likely title lines)
+      if (_isMenuItemStart(line)) {
+        print('SMART PARSING: Found menu item start: "$line"');
+        String fullItem = line;
+
+        // Look ahead to combine continuation lines
+        for (int j = i + 1; j < lines.length && j < i + 3; j++) {
+          String nextLine = lines[j].trim();
+          if (nextLine.isEmpty) break;
+
+          // If next line looks like a continuation, combine it
+          if (_isMenuItemContinuation(nextLine, fullItem)) {
+            print('SMART PARSING: Combining with: "$nextLine"');
+            fullItem += " " + nextLine;
+          } else {
+            break; // Stop if we hit something that doesn't look like a continuation
+          }
+        }
+
+        // Clean up and add if it looks like a complete menu item
+        fullItem = fullItem.trim();
+        if (fullItem.length > 3 && _looksLikeCompleteMenuItem(fullItem)) {
+          print('SMART PARSING: Added complete item: "$fullItem"');
+          menuItems.add(fullItem);
+        } else {
+          print('SMART PARSING: Rejected incomplete item: "$fullItem"');
+        }
+      }
+    }
+
+    print('SMART PARSING: Found ${menuItems.length} menu items');
+    return menuItems;
+  }
+
+  bool _isMenuItemStart(String line) {
+    // Check if line starts a menu item (usually starts with capital letter)
+    if (!RegExp(r'^[A-Z]').hasMatch(line)) return false;
+
+    // Skip obvious UI elements
+    if (line.toLowerCase().contains(RegExp(r'sign|menu|new|dominos|fresh|handmade|our oven-baked|drizzled'))) {
+      return false;
+    }
+
+    // Skip single words that are too short (likely fragments)
+    List<String> words = line.trim().split(' ');
+    if (words.length == 1 && words[0].length < 4) return false;
+
+    // Look for food-related keywords that indicate a menu item name
+    if (line.toLowerCase().contains(RegExp(r'bread|pizza|cheese|stuffed|bites|garlic|parmesan|pepperoni|bacon|spinach|feta|cinnamon|wings?|chicken|pasta|salad'))) {
+      return true;
+    }
+
+    // General capitalized food terms (Name + Adjective pattern)
+    if (RegExp(r'^[A-Z][a-z]+\s+[A-Z&]').hasMatch(line)) return true;
+
+    // Two or more capitalized words (likely menu item)
+    if (RegExp(r'^[A-Z][a-z]+(\s+[A-Z][a-z]+)+').hasMatch(line)) return true;
+
+    return false;
+  }
+
+  bool _isMenuItemContinuation(String line, String currentItem) {
+    // Don't continue if it looks like a new menu item
+    if (_isMenuItemStart(line)) return false;
+
+    // Don't continue if it's obviously descriptive text
+    if (line.toLowerCase().contains(RegExp(r'fresh|handmade|our|oven-baked|drizzled|stuffed and covered'))) {
+      return false;
+    }
+
+    String cleanLine = line.trim();
+    List<String> words = cleanLine.split(' ');
+
+    // Continue if it's a single word that completes the name
+    if (words.length == 1) {
+      String word = words[0].toLowerCase();
+      // Common menu item endings
+      if (RegExp(r'^(bites|bread|cheese|stuffed|wings?|pizza|pasta)$').hasMatch(word)) {
+        return true;
+      }
+      // Also continue for food adjectives
+      if (RegExp(r'^(parmesan|garlic|cinnamon|bacon|pepperoni)$').hasMatch(word)) {
+        return true;
+      }
+    }
+
+    // Continue if it's 2-3 words that look like they complete a menu item
+    if (words.length <= 3) {
+      String lowerLine = cleanLine.toLowerCase();
+      if (lowerLine.contains(RegExp(r'bites|bread|cheese|wings?|dip|sauce'))) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool _looksLikeCompleteMenuItem(String item) {
+    // Must have reasonable length
+    if (item.length < 5 || item.length > 50) return false;
+
+    // Should contain food-related terms
+    if (item.toLowerCase().contains(RegExp(r'bread|pizza|cheese|stuffed|bites|garlic|parmesan|pepperoni|bacon|spinach|feta|cinnamon'))) {
+      return true;
+    }
+
+    return false;
   }
 
   List<MenuItem> _deduplicate(List<MenuItem> items) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'widgets/auth0_login_page.dart';
+import 'widgets/data_caching_test_page.dart';
 import 'core/dependency_injection.dart';
 
 void main() {
@@ -28,6 +29,7 @@ class MenuOptimizerApp extends StatelessWidget {
         routes: {
           '/login': (context) => const Auth0LoginPage(),
           '/home': (context) => const HomeScreen(),
+          '/test-caching': (context) => const DataCachingTestPage(),
         },
         debugShowCheckedModeBanner: false,
       ),

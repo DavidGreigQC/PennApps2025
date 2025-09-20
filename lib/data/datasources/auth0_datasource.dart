@@ -141,25 +141,30 @@ class Auth0DataSource {
 
   /// Get stored credentials
   Future<Credentials?> _getStoredCredentials() async {
-    final prefs = await SharedPreferences.getInstance();
+    try {
+      final prefs = await SharedPreferences.getInstance();
 
-    final accessToken = prefs.getString('auth0_access_token');
-    final idToken = prefs.getString('auth0_id_token');
-    final refreshToken = prefs.getString('auth0_refresh_token');
-    final expiresAt = prefs.getInt('auth0_expires_at');
+      final accessToken = prefs.getString('auth0_access_token');
+      final idToken = prefs.getString('auth0_id_token');
+      final refreshToken = prefs.getString('auth0_refresh_token');
+      final expiresAt = prefs.getInt('auth0_expires_at');
 
-    if (accessToken != null && idToken != null && expiresAt != null) {
-      return Credentials(
-        accessToken: accessToken,
-        idToken: idToken,
-        refreshToken: refreshToken,
-        tokenType: 'Bearer',
-        expiresAt: DateTime.fromMillisecondsSinceEpoch(expiresAt),
-        user: UserProfile.fromMap({}), // Empty user profile, will be fetched later
-      );
+      if (accessToken != null && idToken != null && expiresAt != null) {
+        return Credentials(
+          accessToken: accessToken,
+          idToken: idToken,
+          refreshToken: refreshToken,
+          tokenType: 'Bearer',
+          expiresAt: DateTime.fromMillisecondsSinceEpoch(expiresAt),
+          user: UserProfile.fromMap({}), // Empty user profile, will be fetched later
+        );
+      }
+
+      return null;
+    } catch (e) {
+      print('⚠️ Error getting stored credentials: $e');
+      return null;
     }
-
-    return null;
   }
 
   /// Clear stored credentials
@@ -184,11 +189,11 @@ class Auth0DataSource {
     if (_user == null) return {};
 
     return {
-      'auth0_id': _user!.sub,
-      'name': _user!.name,
-      'email': _user!.email,
-      'picture': _user!.pictureUrl.toString(),
-      'verified': _user!.isEmailVerified,
+      'auth0_id': _user!.sub ?? '',
+      'name': _user!.name ?? 'Unknown User',
+      'email': _user!.email ?? '',
+      'picture': _user!.pictureUrl?.toString() ?? '',
+      'verified': _user!.isEmailVerified ?? false,
       'last_login': DateTime.now().toIso8601String(),
     };
   }

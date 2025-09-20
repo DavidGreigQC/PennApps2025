@@ -58,6 +58,21 @@ class NutritionalDataService {
       nutritionData = await _searchGenericFoodDatabase(item.name);
     }
 
+    // If item has no price, attempt to look it up online
+    if (item.price == 0.0) {
+      double? lookedUpPrice = await _lookupPrice(item.name, restaurantName);
+      if (lookedUpPrice != null) {
+        // Create a copy with the found price
+        item = item.copyWith(price: lookedUpPrice);
+        debugPrint('PRICE LOOKUP: Found ${item.name} = \$${lookedUpPrice}');
+      } else {
+        // Set estimated price based on item type if still 0
+        double estimatedPrice = _estimatePrice(item.name, restaurantName);
+        item = item.copyWith(price: estimatedPrice);
+        debugPrint('PRICE ESTIMATE: ${item.name} = \$${estimatedPrice} (estimated)');
+      }
+    }
+
     if (nutritionData != null) {
       _nutritionCache[cacheKey] = nutritionData;
       return _applyNutritionData(item, nutritionData);
@@ -274,8 +289,13 @@ class NutritionalDataService {
 
   /// CRITICAL: Validates that enriched item is still the same original menu item
   bool _isSameOriginalItem(MenuItem original, MenuItem enriched) {
-    // Core identity must match: name and price
-    if (original.name != enriched.name || original.price != enriched.price) {
+    // Core identity must match: name
+    if (original.name != enriched.name) {
+      return false;
+    }
+
+    // Allow price changes only if original price was 0.0 (missing price)
+    if (original.price != enriched.price && original.price != 0.0) {
       return false;
     }
 
@@ -288,5 +308,48 @@ class NutritionalDataService {
     }
 
     return true;
+  }
+
+  /// Look up menu item price online (placeholder for future API integration)
+  Future<double?> _lookupPrice(String itemName, String? restaurantName) async {
+    try {
+      // For now, return null to use estimation
+      // In the future, this could call external price APIs
+      return null;
+    } catch (e) {
+      debugPrint('Price lookup failed for $itemName: $e');
+      return null;
+    }
+  }
+
+  /// Estimate reasonable price based on item type and restaurant
+  double _estimatePrice(String itemName, String? restaurantName) {
+    String lowerName = itemName.toLowerCase();
+    String lowerRestaurant = (restaurantName ?? '').toLowerCase();
+
+    // Domino's specific pricing
+    if (lowerRestaurant.contains('domino')) {
+      if (lowerName.contains('bread')) {
+        if (lowerName.contains('bites')) return 6.99;
+        if (lowerName.contains('stuffed')) return 7.99;
+        return 5.99;
+      }
+      if (lowerName.contains('pizza')) {
+        if (lowerName.contains('large')) return 13.99;
+        if (lowerName.contains('medium')) return 11.99;
+        return 9.99;
+      }
+    }
+
+    // Generic fast food pricing
+    if (lowerName.contains('bread') || lowerName.contains('bites')) return 5.99;
+    if (lowerName.contains('pizza')) return 12.99;
+    if (lowerName.contains('burger') || lowerName.contains('sandwich')) return 8.99;
+    if (lowerName.contains('salad')) return 7.99;
+    if (lowerName.contains('drink') || lowerName.contains('soda')) return 2.99;
+    if (lowerName.contains('fries') || lowerName.contains('side')) return 3.99;
+
+    // Default price for unknown items
+    return 6.99;
   }
 }
