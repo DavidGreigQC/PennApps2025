@@ -291,6 +291,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
                       height: 200,
                       child: LineChart(
                         LineChartData(
+                          lineTouchData: LineTouchData(
+                            touchTooltipData: LineTouchTooltipData(
+                              tooltipBgColor: const Color.fromARGB(255, 246, 246, 246)!,
+                              tooltipRoundedRadius: 8,
+                              tooltipPadding: const EdgeInsets.all(8),
+                              getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                                return touchedBarSpots.map((barSpot) {
+                                  return LineTooltipItem(
+                                    '${barSpot.y.toStringAsFixed(1)}%',
+                                    TextStyle(
+                                      color: const Color.fromARGB(255, 124, 37, 137),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                            ),
+                          ),
                           gridData: FlGridData(
                             show: true,
                             drawVerticalLine: false,

@@ -10,6 +10,7 @@ import '../widgets/file_upload_widget.dart';
 import '../widgets/optimization_form_widget.dart';
 import 'welcome_screen.dart';
 import '../widgets/results_display_widget.dart';
+import '../services/local_stats_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -212,11 +213,18 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               ),
               const SizedBox(height: 16),
               FileUploadWidget(
-                onFilesSelected: (files) {
+                onFilesSelected: (files) async {
+                  final previousCount = _uploadedFilesAndUrls.length;
                   setState(() {
                     _uploadedFilesAndUrls = files;
                   });
                   _updateBreadcrumbs();
+
+                  // Increment menu count if new files were added
+                  if (files.length > previousCount) {
+                    final newMenus = files.length - previousCount;
+                    await LocalStatsService.instance.incrementMenuCount(newMenus);
+                  }
                 },
               ),
             ],
@@ -662,6 +670,9 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     setState(() {
       _currentPage = 2; // Results page is now index 2 (was 2, now 3-1)
     });
+
+    // Increment optimization count
+    await LocalStatsService.instance.incrementOptimizationCount();
 
     final service = Provider.of<MenuOptimizationService>(context, listen: false);
 

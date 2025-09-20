@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/datasources/auth0_datasource.dart';
 import '../data/datasources/mongodb_datasource.dart';
+import '../services/local_stats_service.dart';
 
 /// Auth0 Professional Login Page
 /// Best-in-class authentication for PennApps 2025
@@ -31,6 +32,9 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
       // Initialize Auth0
       _auth0.initialize();
 
+      // Initialize local stats service
+      await LocalStatsService.instance.initialize();
+
       // Try to restore existing session
       final result = await _auth0.restoreSession();
       if (result.success && result.userId != null) {
@@ -40,8 +44,8 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
         return;
       }
 
-      // Load community stats in background (non-blocking)
-      _loadCommunityStatsInBackground();
+      // Load community stats from local storage
+      await _loadCommunityStats();
 
     } catch (e) {
       setState(() {
@@ -135,8 +139,7 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
   /// Load community statistics
   Future<void> _loadCommunityStats() async {
     try {
-      final mongoDataSource = context.read<MongoDBDataSource>();
-      final stats = await mongoDataSource.getCommunityInsights();
+      final stats = await LocalStatsService.instance.getCommunityInsights();
       setState(() {
         _communityStats = stats;
       });
