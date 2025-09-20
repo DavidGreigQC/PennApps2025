@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
 class FileUploadWidget extends StatefulWidget {
   final Function(List<String>) onFilesSelected;
@@ -24,7 +23,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -72,7 +71,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: Theme.of(context).cardTheme.color ?? Colors.grey[50],
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.grey[200]!, width: 1),
               ),
@@ -161,7 +160,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Theme.of(context).cardTheme.color ?? Colors.white,
                       prefixIcon: Icon(Icons.language_rounded, color: Colors.grey[500]),
                       suffixIcon: Container(
                         margin: const EdgeInsets.all(4),
@@ -260,7 +259,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
       margin: const EdgeInsets.symmetric(vertical: 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.grey[200]!, width: 1),
         boxShadow: [

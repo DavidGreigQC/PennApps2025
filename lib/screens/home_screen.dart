@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     return Consumer<ThemeService>(
       builder: (context, themeService, child) {
         return Scaffold(
-          backgroundColor: themeService.isDarkMode ? Theme.of(context).scaffoldBackgroundColor : Colors.grey[50],
+          backgroundColor: themeService.isDarkMode ? const Color(0xFF0B1426) : Colors.grey[50],
       appBar: AppBar(
         title: Center(
           child: Image.asset(
@@ -49,13 +49,24 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
         centerTitle: true,
         toolbarHeight: 100,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue[600]!, Colors.blue[800]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+          decoration: themeService.isDarkMode
+              ? const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF1A2742),
+                      Color(0xFF16213E),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                )
+              : BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blue[600]!, Colors.blue[800]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
         ),
         actions: [
           Container(
@@ -84,16 +95,21 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           ),
         ],
       ),
-      body: AnimatedSwitcher(
+      body: Container(
+        decoration: themeService.isDarkMode
+            ? ThemeService.darkGradientDecoration
+            : null,
+        child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (Widget child, Animation<double> animation) {
           return FadeTransition(opacity: animation, child: child);
         },
         child: _currentPage == 0
-            ? Container(key: const ValueKey(0), child: _buildUploadPage())
+            ? Container(key: const ValueKey(0), child: _buildUploadPage(themeService))
             : _currentPage == 1
-                ? Container(key: const ValueKey(1), child: _buildOptimizationPage())
-                : Container(key: const ValueKey(2), child: _buildResultsPage()),
+                ? Container(key: const ValueKey(1), child: _buildOptimizationPage(themeService))
+                : Container(key: const ValueKey(2), child: _buildResultsPage(themeService)),
+        ),
       ),
           bottomNavigationBar: _buildBottomNavigation(),
         );
@@ -102,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   }
 
 
-  Widget _buildUploadPage() {
+  Widget _buildUploadPage(ThemeService themeService) {
     return Stack(
       children: [
         SingleChildScrollView(
@@ -112,15 +128,32 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
             children: [
               Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.blue[50]!, Colors.blue[100]!],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  gradient: themeService.isDarkMode
+                      ? const LinearGradient(
+                          colors: [
+                            Color(0xFF1A2742),
+                            Color(0xFF22334A),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : LinearGradient(
+                          colors: [Colors.blue[50]!, Colors.blue[100]!],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                   borderRadius: BorderRadius.circular(20),
+                  border: themeService.isDarkMode
+                      ? Border.all(
+                          color: const Color(0xFF4A90E2).withValues(alpha: 0.3),
+                          width: 1,
+                        )
+                      : null,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.blue.withValues(alpha: 0.1),
+                      color: themeService.isDarkMode
+                          ? const Color(0xFF4A90E2).withValues(alpha: 0.2)
+                          : Colors.blue.withValues(alpha: 0.1),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -133,11 +166,15 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.blue[600],
+                          color: themeService.isDarkMode
+                              ? const Color(0xFF4A90E2)
+                              : Colors.blue[600],
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.blue.withValues(alpha: 0.3),
+                              color: themeService.isDarkMode
+                                  ? const Color(0xFF4A90E2).withValues(alpha: 0.4)
+                                  : Colors.blue.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -154,14 +191,18 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                               'Upload Menu Files',
                               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: Colors.blue[800],
+                                color: themeService.isDarkMode
+                                    ? Colors.white
+                                    : Colors.blue[800],
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Upload PDFs, images, or enter a menu URL to get started.',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.blue[700],
+                                color: themeService.isDarkMode
+                                    ? Colors.white70
+                                    : Colors.blue[700],
                               ),
                             ),
                           ],
@@ -196,15 +237,26 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
             bottom: 16,
             child: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue[600]!, Colors.blue[700]!],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: themeService.isDarkMode
+                    ? const LinearGradient(
+                        colors: [
+                          Color(0xFF4A90E2),
+                          Color(0xFF357ABD),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : LinearGradient(
+                        colors: [Colors.blue[600]!, Colors.blue[700]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.blue.withValues(alpha: 0.3),
+                    color: themeService.isDarkMode
+                        ? const Color(0xFF4A90E2).withValues(alpha: 0.4)
+                        : Colors.blue.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -242,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     );
   }
 
-  Widget _buildOptimizationPage() {
+  Widget _buildOptimizationPage(ThemeService themeService) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -250,15 +302,32 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
         children: [
           Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.green[50]!, Colors.green[100]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              gradient: themeService.isDarkMode
+                  ? const LinearGradient(
+                      colors: [
+                        Color(0xFF1A2742),
+                        Color(0xFF22334A),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : LinearGradient(
+                      colors: [Colors.green[50]!, Colors.green[100]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
               borderRadius: BorderRadius.circular(20),
+              border: themeService.isDarkMode
+                  ? Border.all(
+                      color: Colors.green.withValues(alpha: 0.3),
+                      width: 1,
+                    )
+                  : null,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.green.withValues(alpha: 0.1),
+                  color: themeService.isDarkMode
+                      ? Colors.green.withValues(alpha: 0.2)
+                      : Colors.green.withValues(alpha: 0.1),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -271,11 +340,15 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.green[600],
+                      color: themeService.isDarkMode
+                          ? Colors.green[600]
+                          : Colors.green[600],
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.green.withValues(alpha: 0.3),
+                          color: themeService.isDarkMode
+                              ? Colors.green.withValues(alpha: 0.4)
+                              : Colors.green.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -292,14 +365,18 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                           'Optimization Criteria',
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: Colors.green[800],
+                            color: themeService.isDarkMode
+                                ? Colors.white
+                                : Colors.green[800],
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Set your preferences for finding the optimal menu items.',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.green[700],
+                            color: themeService.isDarkMode
+                                ? Colors.white70
+                                : Colors.green[700],
                           ),
                         ),
                       ],
@@ -321,15 +398,26 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           if (_optimizationRequest != null)
             Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.green[600]!, Colors.green[700]!],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: themeService.isDarkMode
+                    ? const LinearGradient(
+                        colors: [
+                          Colors.green,
+                          Color(0xFF27AE60),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : LinearGradient(
+                        colors: [Colors.green[600]!, Colors.green[700]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.green.withValues(alpha: 0.3),
+                    color: themeService.isDarkMode
+                        ? Colors.green.withValues(alpha: 0.4)
+                        : Colors.green.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -367,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     );
   }
 
-  Widget _buildResultsPage() {
+  Widget _buildResultsPage(ThemeService themeService) {
     return Consumer<MenuOptimizationService>(
       builder: (context, service, child) {
         return SingleChildScrollView(
@@ -377,15 +465,32 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
             children: [
               Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.purple[50]!, Colors.purple[100]!],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  gradient: themeService.isDarkMode
+                      ? const LinearGradient(
+                          colors: [
+                            Color(0xFF1A2742),
+                            Color(0xFF22334A),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : LinearGradient(
+                          colors: [Colors.purple[50]!, Colors.purple[100]!],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                   borderRadius: BorderRadius.circular(20),
+                  border: themeService.isDarkMode
+                      ? Border.all(
+                          color: const Color(0xFF9C5AE0).withValues(alpha: 0.3),
+                          width: 1,
+                        )
+                      : null,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.purple.withValues(alpha: 0.1),
+                      color: themeService.isDarkMode
+                          ? const Color(0xFF9C5AE0).withValues(alpha: 0.2)
+                          : Colors.purple.withValues(alpha: 0.1),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -398,11 +503,15 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.purple[600],
+                          color: themeService.isDarkMode
+                              ? const Color(0xFF9C5AE0)
+                              : Colors.purple[600],
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.purple.withValues(alpha: 0.3),
+                              color: themeService.isDarkMode
+                                  ? const Color(0xFF9C5AE0).withValues(alpha: 0.4)
+                                  : Colors.purple.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -419,7 +528,9 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                               'Optimization Results',
                               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: Colors.purple[800],
+                                color: themeService.isDarkMode
+                                    ? Colors.white
+                                    : Colors.purple[800],
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -439,7 +550,9 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                                     child: Text(
                                       service.status,
                                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        color: Colors.purple[700],
+                                        color: themeService.isDarkMode
+                                            ? Colors.white70
+                                            : Colors.purple[700],
                                       ),
                                     ),
                                   ),
@@ -449,14 +562,18 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                               Text(
                                 'Found ${service.results.length} optimal recommendations.',
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.purple[700],
+                                  color: themeService.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.purple[700],
                                 ),
                               )
                             else
                               Text(
                                 'Your optimization results will appear here.',
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.purple[700],
+                                  color: themeService.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.purple[700],
                                 ),
                               ),
                           ],
@@ -477,54 +594,62 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   }
 
   Widget _buildBottomNavigation() {
-    return Consumer<MenuOptimizationService>(
-      builder: (context, service, child) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return Consumer<MenuOptimizationService>(
+          builder: (context, service, child) {
+            return Container(
+              decoration: BoxDecoration(
+                color: themeService.isDarkMode
+                    ? const Color(0xFF1A2742)
+                    : Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: themeService.isDarkMode
+                        ? Colors.black.withValues(alpha: 0.3)
+                        : Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: SafeArea(
-            child: Container(
-              height: 65,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _buildNavItems(service),
+              child: SafeArea(
+                child: Container(
+                  height: 65,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: _buildNavItems(service, themeService),
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
   }
 
-  List<Widget> _buildNavItems(MenuOptimizationService service) {
+  List<Widget> _buildNavItems(MenuOptimizationService service, ThemeService themeService) {
     List<Widget> navItems = [
-      _buildNavItem(0, Icons.home_rounded, 'Home', service),
-      _buildNavItem(1, Icons.upload_file_rounded, 'Upload', service),
+      _buildNavItem(0, Icons.home_rounded, 'Home', service, themeService),
+      _buildNavItem(1, Icons.upload_file_rounded, 'Upload', service, themeService),
     ];
 
     // Add Optimize tab if files are uploaded
     if (_uploadedFilesAndUrls.isNotEmpty) {
-      navItems.add(_buildNavItem(2, Icons.tune_rounded, 'Optimize', service));
+      navItems.add(_buildNavItem(2, Icons.tune_rounded, 'Optimize', service, themeService));
     }
 
     // Add Results tab if optimization has started
     if (service.results.isNotEmpty || service.isProcessing || service.status.isNotEmpty) {
-      navItems.add(_buildNavItem(3, Icons.analytics_rounded, 'Results', service));
+      navItems.add(_buildNavItem(3, Icons.analytics_rounded, 'Results', service, themeService));
     }
 
     return navItems;
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label, MenuOptimizationService service) {
+  Widget _buildNavItem(int index, IconData icon, String label, MenuOptimizationService service, ThemeService themeService) {
     bool isSelected = (index == 0) ? false : _currentPage == (index - 1);
     bool canNavigate = _canNavigateToPage(index, service);
 
@@ -533,10 +658,14 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
         : Colors.transparent;
     Color iconColor = isSelected
         ? Colors.white
-        : canNavigate ? Colors.grey[600]! : Colors.grey[400]!;
+        : canNavigate
+            ? (themeService.isDarkMode ? Colors.white70 : Colors.grey[600]!)
+            : (themeService.isDarkMode ? Colors.white30 : Colors.grey[400]!);
     Color textColor = isSelected
         ? Colors.white
-        : canNavigate ? Colors.grey[700]! : Colors.grey[400]!;
+        : canNavigate
+            ? (themeService.isDarkMode ? Colors.white70 : Colors.grey[700]!)
+            : (themeService.isDarkMode ? Colors.white30 : Colors.grey[400]!);
 
     return Expanded(
       child: Material(

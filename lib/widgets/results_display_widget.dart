@@ -31,7 +31,7 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -46,7 +46,7 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: Theme.of(context).cardTheme.color ?? Colors.grey[50],
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -113,7 +113,7 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -234,7 +234,7 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
           Container(
             margin: const EdgeInsets.only(top: 8),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: Theme.of(context).cardTheme.color ?? Colors.grey[50],
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16),
@@ -340,7 +340,7 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
                             margin: const EdgeInsets.symmetric(vertical: 4),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Theme.of(context).cardTheme.color ?? Colors.white,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: Colors.grey[200]!, width: 1),
                             ),
@@ -442,7 +442,7 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
           width: (MediaQuery.of(context).size.width - 64) / 3,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardTheme.color ?? Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.grey[200]!, width: 1),
             boxShadow: [
@@ -632,7 +632,7 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
       margin: const EdgeInsets.symmetric(vertical: 4),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey[200]!, width: 1),
         boxShadow: [

@@ -122,7 +122,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
   Widget _buildRestaurantInfoSection() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -164,7 +164,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Theme.of(context).cardTheme.color ?? Colors.grey[100],
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -188,7 +188,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: Colors.grey[50],
+                fillColor: Theme.of(context).cardTheme.color ?? Colors.grey[50],
                 prefixIcon: Icon(Icons.restaurant_rounded, color: Colors.grey[500]),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
@@ -204,7 +204,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: Colors.grey[50],
+                fillColor: Theme.of(context).cardTheme.color ?? Colors.grey[50],
                 prefixIcon: Icon(Icons.location_on_rounded, color: Colors.grey[500]),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
@@ -220,7 +220,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: Colors.grey[50],
+                fillColor: Theme.of(context).cardTheme.color ?? Colors.grey[50],
                 prefixIcon: Icon(Icons.language_rounded, color: Colors.grey[500]),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
@@ -244,7 +244,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
   Widget _buildCriteriaSection() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -316,7 +316,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey[200]!, width: 1.5),
         boxShadow: [
@@ -384,7 +384,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
             // Dropdown on separate line
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: Theme.of(context).cardTheme.color ?? Colors.grey[50],
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.grey[200]!, width: 1),
               ),
@@ -556,7 +556,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardTheme.color ?? Colors.white,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.orange[200]!, width: 1),
                     ),
@@ -572,7 +572,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                             child: Container(
                               height: 44,
                               decoration: BoxDecoration(
-                                color: criteria.isMaximize ? Colors.orange[500] : Colors.white,
+                                color: criteria.isMaximize ? Colors.orange[500] : (Theme.of(context).cardTheme.color ?? Colors.white),
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(8),
                                   bottomLeft: Radius.circular(8),
@@ -613,7 +613,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                             child: Container(
                               height: 44,
                               decoration: BoxDecoration(
-                                color: !criteria.isMaximize ? Colors.orange[500] : Colors.white,
+                                color: !criteria.isMaximize ? Colors.orange[500] : (Theme.of(context).cardTheme.color ?? Colors.white),
                                 borderRadius: const BorderRadius.only(
                                   topRight: Radius.circular(8),
                                   bottomRight: Radius.circular(8),
@@ -659,7 +659,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
   Widget _buildConstraintsSection() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -703,7 +703,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
             const SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: Theme.of(context).cardTheme.color ?? Colors.grey[50],
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.grey[200]!, width: 1),
               ),
@@ -737,7 +737,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: Theme.of(context).cardTheme.color ?? Colors.white,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                         suffixIcon: Container(
                           margin: const EdgeInsets.all(4),
@@ -814,7 +814,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                           ),
                           selected: isSelected,
                           selectedColor: Colors.orange[200],
-                          backgroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).cardTheme.color ?? Colors.white,
                           side: BorderSide(
                             color: isSelected ? Colors.orange[400]! : Colors.grey[300]!,
                             width: 1,
@@ -877,7 +877,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                           ),
                           selected: isSelected,
                           selectedColor: Colors.blue[200],
-                          backgroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).cardTheme.color ?? Colors.white,
                           side: BorderSide(
                             color: isSelected ? Colors.blue[400]! : Colors.grey[300]!,
                             width: 1,
