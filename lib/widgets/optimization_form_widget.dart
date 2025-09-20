@@ -54,61 +54,67 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildCriteriaSection(),
-          const SizedBox(height: 20),
-          _buildConstraintsSection(),
-          const SizedBox(height: 20),
-          _buildRestaurantInfoSection(),
-          const SizedBox(height: 20),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.orange[600]!, Colors.orange[700]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.orange.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+    return GestureDetector(
+      onTap: () {
+        // Dismiss keyboard when tapping outside of text fields
+        FocusScope.of(context).unfocus();
+      },
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildCriteriaSection(),
+            const SizedBox(height: 20),
+            _buildConstraintsSection(),
+            const SizedBox(height: 20),
+            _buildRestaurantInfoSection(),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.orange[600]!, Colors.orange[700]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            child: ElevatedButton(
-              onPressed: _submitForm,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                foregroundColor: Colors.white,
-                shadowColor: Colors.transparent,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.settings_rounded, size: 20),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Set Optimization Criteria',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.orange.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
+              child: ElevatedButton(
+                onPressed: _submitForm,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.settings_rounded, size: 20),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Set Optimization Criteria',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -733,9 +739,26 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        suffixIcon: Container(
+                          margin: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.green[600],
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.check_rounded, color: Colors.white, size: 20),
+                            onPressed: () {
+                              FocusScope.of(context).unfocus();
+                            },
+                            tooltip: 'Done',
+                          ),
+                        ),
                       ),
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) {
+                        FocusScope.of(context).unfocus();
+                      },
                       validator: (value) {
                         if (value != null && value.isNotEmpty) {
                           if (double.tryParse(value) == null) {
