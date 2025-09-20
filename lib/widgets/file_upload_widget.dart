@@ -94,35 +94,32 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildUploadOption(
-                          icon: Icons.camera_alt_rounded,
-                          title: 'Camera',
-                          subtitle: 'Take Photo',
-                          color: Colors.green,
-                          onTap: _takePhoto,
-                        ),
-                        const SizedBox(width: 12),
-                        _buildUploadOption(
-                          icon: Icons.photo_library_rounded,
-                          title: 'Gallery',
-                          subtitle: 'Photos',
-                          color: Colors.orange,
-                          onTap: _pickFromGallery,
-                        ),
-                        const SizedBox(width: 12),
-                        _buildUploadOption(
-                          icon: Icons.upload_file_rounded,
-                          title: 'Files',
-                          subtitle: 'PDF/Image',
-                          color: Colors.purple,
-                          onTap: _pickFiles,
-                        ),
-                      ],
-                    ),
+                  Column(
+                    children: [
+                      _buildUploadOption(
+                        icon: Icons.camera_alt_rounded,
+                        title: 'Camera',
+                        subtitle: 'Take Photo',
+                        color: Colors.green,
+                        onTap: _takePhoto,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildUploadOption(
+                        icon: Icons.photo_library_rounded,
+                        title: 'Gallery',
+                        subtitle: 'Photos',
+                        color: Colors.orange,
+                        onTap: _pickFromGallery,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildUploadOption(
+                        icon: Icons.upload_file_rounded,
+                        title: 'Files',
+                        subtitle: 'PDF/Image',
+                        color: Colors.purple,
+                        onTap: _pickFiles,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -404,8 +401,8 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          width: 100,
-          height: 100,
+          width: double.infinity,
+          height: 70,
           decoration: BoxDecoration(
             color: color[50],
             borderRadius: BorderRadius.circular(12),
@@ -418,39 +415,55 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
               ),
             ],
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color[100],
-                  borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: color[100],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 24,
+                    color: color[700],
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  size: 24,
-                  color: color[700],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          color: color[700],
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: color[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                  color: color[700],
-                ),
-              ),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 10,
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
                   color: color[600],
-                  fontWeight: FontWeight.w500,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
