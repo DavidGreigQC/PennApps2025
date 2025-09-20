@@ -11,6 +11,8 @@ import '../widgets/optimization_form_widget.dart';
 import 'welcome_screen.dart';
 import '../widgets/results_display_widget.dart';
 import '../services/local_stats_service.dart';
+import '../services/theme_service.dart';
+import '../widgets/settings_popup.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,13 +32,15 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return Scaffold(
+          backgroundColor: themeService.isDarkMode ? Theme.of(context).scaffoldBackgroundColor : Colors.grey[50],
       appBar: AppBar(
         title: Center(
           child: Image.asset(
             'assets/images/menumaxlogo.png',
-            height: 80,
+            height: 120,
             fit: BoxFit.contain,
           ),
         ),
@@ -54,6 +58,18 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           ),
         ),
         actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.settings_rounded, color: Colors.white),
+              onPressed: () => SettingsPopup.show(context),
+              tooltip: 'Settings',
+            ),
+          ),
           Container(
             margin: const EdgeInsets.only(right: 16),
             decoration: BoxDecoration(
@@ -79,7 +95,9 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                 ? Container(key: const ValueKey(1), child: _buildOptimizationPage())
                 : Container(key: const ValueKey(2), child: _buildResultsPage()),
       ),
-      bottomNavigationBar: _buildBottomNavigation(),
+          bottomNavigationBar: _buildBottomNavigation(),
+        );
+      },
     );
   }
 

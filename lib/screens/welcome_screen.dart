@@ -3,6 +3,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import 'home_screen.dart';
 import '../services/menu_optimization_service.dart';
+import '../services/theme_service.dart';
+import '../widgets/settings_popup.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -26,13 +28,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final themeService = Provider.of<ThemeService>(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: themeService.isDarkMode ? const Color(0xFF0B1426) : Colors.grey[50],
       appBar: AppBar(
         title: Center(
           child: Image.asset(
             'assets/images/menumaxlogo.png',
-            height: 80,
+            height: 120,
             fit: BoxFit.contain,
           ),
         ),
@@ -41,13 +45,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
         centerTitle: true,
         toolbarHeight: 100,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue[600]!, Colors.blue[800]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+          decoration: themeService.isDarkMode
+              ? const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF1A2742),
+                      Color(0xFF16213E),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                )
+              : BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blue[600]!, Colors.blue[800]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
         ),
         actions: [
           Container(
@@ -58,407 +73,531 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
             ),
             child: IconButton(
               icon: const Icon(Icons.settings_rounded, color: Colors.white),
-              onPressed: () {},
+              onPressed: () => SettingsPopup.show(context),
               tooltip: 'Settings',
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Welcome Header
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.green[50]!, Colors.green[100]!],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.green.withValues(alpha: 0.1),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.green[600],
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.green.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(Icons.home_rounded, size: 32, color: Colors.white),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Welcome Back!',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: Colors.green[800],
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Track your savings and optimization progress.',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.green[700],
-                            ),
-                          ),
-                        ],
-                      ),
+      body: Container(
+        decoration: themeService.isDarkMode
+            ? ThemeService.darkGradientDecoration
+            : null,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Welcome Header
+              Container(
+                decoration: BoxDecoration(
+                  gradient: themeService.isDarkMode
+                      ? const LinearGradient(
+                          colors: [
+                            Color(0xFF1A2742),
+                            Color(0xFF22334A),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : LinearGradient(
+                          colors: [Colors.green[50]!, Colors.green[100]!],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: themeService.isDarkMode
+                      ? Border.all(
+                          color: const Color(0xFF4A90E2).withValues(alpha: 0.3),
+                          width: 1,
+                        )
+                      : null,
+                  boxShadow: [
+                    BoxShadow(
+                      color: themeService.isDarkMode
+                          ? const Color(0xFF4A90E2).withValues(alpha: 0.2)
+                          : Colors.green.withValues(alpha: 0.1),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Money Saved Card
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.green[50],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.savings_rounded,
-                            color: Colors.green[600],
-                            size: 20,
-                          ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: themeService.isDarkMode
+                              ? const Color(0xFF4A90E2)
+                              : Colors.green[600],
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: themeService.isDarkMode
+                                  ? const Color(0xFF4A90E2).withValues(alpha: 0.4)
+                                  : Colors.green.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Estimated Money Saved',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
+                        child: Icon(Icons.home_rounded, size: 32, color: Colors.white),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Welcome Back!',
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: themeService.isDarkMode
+                                    ? Colors.white
+                                    : Colors.green[800],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Track your savings and optimization progress.',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: themeService.isDarkMode
+                                    ? Colors.white70
+                                    : Colors.green[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Money Saved Card
+              Container(
+                decoration: BoxDecoration(
+                  color: themeService.isDarkMode
+                      ? const Color(0xFF1A2742)
+                      : Colors.white,
+                  border: themeService.isDarkMode
+                      ? Border.all(
+                          color: const Color(0xFF4A90E2).withValues(alpha: 0.3),
+                          width: 1,
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: themeService.isDarkMode
+                          ? const Color(0xFF4A90E2).withValues(alpha: 0.15)
+                          : Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: themeService.isDarkMode
+                                  ? const Color(0xFF4A90E2).withValues(alpha: 0.2)
+                                  : Colors.green[50],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.savings_rounded,
+                              color: themeService.isDarkMode
+                                  ? const Color(0xFF4A90E2)
+                                  : Colors.green[600],
+                              size: 20,
                             ),
                           ),
-                        ),
-                        Icon(
-                          Icons.info_outline_rounded,
-                          color: Colors.grey[500],
-                          size: 18,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '\$${estimatedSavings.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.green[600],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Based on your optimization choices',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.orange[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.orange[200]!, width: 1),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.warning_amber_rounded,
-                            color: Colors.orange[600],
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'This is an AI estimate based on typical food costs and may not reflect actual savings.',
-                              style: TextStyle(
-                                color: Colors.orange[700],
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                              'Estimated Money Saved',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: themeService.isDarkMode
+                                    ? Colors.white
+                                    : Colors.grey[800],
                               ),
                             ),
+                          ),
+                          Icon(
+                            Icons.info_outline_rounded,
+                            color: themeService.isDarkMode
+                                ? Colors.white60
+                                : Colors.grey[500],
+                            size: 18,
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Optimization Progress Chart
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.purple[50],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.trending_up_rounded,
-                            color: Colors.purple[600],
-                            size: 20,
-                          ),
+                      const SizedBox(height: 16),
+                      Text(
+                        '\$${estimatedSavings.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
+                          color: themeService.isDarkMode
+                              ? const Color(0xFF4A90E2)
+                              : Colors.green[600],
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Optimization Progress',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Last 10 Optimizations',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      height: 200,
-                      child: LineChart(
-                        LineChartData(
-                          lineTouchData: LineTouchData(
-                            touchTooltipData: LineTouchTooltipData(
-                              tooltipBgColor: const Color.fromARGB(255, 246, 246, 246)!,
-                              tooltipRoundedRadius: 8,
-                              tooltipPadding: const EdgeInsets.all(8),
-                              getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
-                                return touchedBarSpots.map((barSpot) {
-                                  return LineTooltipItem(
-                                    '${barSpot.y.toStringAsFixed(1)}%',
-                                    TextStyle(
-                                      color: const Color.fromARGB(255, 124, 37, 137),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  );
-                                }).toList();
-                              },
-                            ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Based on your optimization choices',
+                        style: TextStyle(
+                          color: themeService.isDarkMode
+                              ? Colors.white60
+                              : Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: themeService.isDarkMode
+                              ? const Color(0xFFFF8A50).withValues(alpha: 0.1)
+                              : Colors.orange[50],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: themeService.isDarkMode
+                                ? const Color(0xFFFF8A50).withValues(alpha: 0.3)
+                                : Colors.orange[200]!,
+                            width: 1,
                           ),
-                          gridData: FlGridData(
-                            show: true,
-                            drawVerticalLine: false,
-                            horizontalInterval: 10,
-                            getDrawingHorizontalLine: (value) {
-                              return FlLine(
-                                color: Colors.grey[200]!,
-                                strokeWidth: 1,
-                              );
-                            },
-                          ),
-                          titlesData: FlTitlesData(
-                            show: true,
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 30,
-                                interval: 2,
-                                getTitlesWidget: (value, meta) {
-                                  return Text(
-                                    '${value.toInt() + 1}',
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 12,
-                                    ),
-                                  );
-                                },
-                              ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.warning_amber_rounded,
+                              color: themeService.isDarkMode
+                                  ? const Color(0xFFFF8A50)
+                                  : Colors.orange[600],
+                              size: 16,
                             ),
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 40,
-                                interval: 10,
-                                getTitlesWidget: (value, meta) {
-                                  return Text(
-                                    '${value.toInt()}%',
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 12,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          ),
-                          borderData: FlBorderData(
-                            show: true,
-                            border: Border(
-                              bottom: BorderSide(color: Colors.grey[300]!),
-                              left: BorderSide(color: Colors.grey[300]!),
-                            ),
-                          ),
-                          minX: 0,
-                          maxX: 9,
-                          minY: 0,
-                          maxY: 50,
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: last10OptimizationPercents.asMap().entries.map((e) {
-                                return FlSpot(e.key.toDouble(), e.value);
-                              }).toList(),
-                              isCurved: true,
-                              gradient: LinearGradient(
-                                colors: [Colors.purple[400]!, Colors.purple[600]!],
-                              ),
-                              barWidth: 3,
-                              isStrokeCapRound: true,
-                              dotData: FlDotData(
-                                show: true,
-                                getDotPainter: (spot, percent, barData, index) {
-                                  return FlDotCirclePainter(
-                                    radius: 4,
-                                    color: Colors.purple[600]!,
-                                    strokeWidth: 2,
-                                    strokeColor: Colors.white,
-                                  );
-                                },
-                              ),
-                              belowBarData: BarAreaData(
-                                show: true,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.purple[100]!.withValues(alpha: 0.3),
-                                    Colors.purple[50]!.withValues(alpha: 0.1),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'This is an AI estimate based on typical food costs and may not reflect actual savings.',
+                                style: TextStyle(
+                                  color: themeService.isDarkMode
+                                      ? const Color(0xFFFF8A50)
+                                      : Colors.orange[700],
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Average',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                              ),
-                            ),
-                            Text(
-                              '${(last10OptimizationPercents.reduce((a, b) => a + b) / last10OptimizationPercents.length).toStringAsFixed(1)}%',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.purple[600],
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'Best',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                              ),
-                            ),
-                            Text(
-                              '${last10OptimizationPercents.reduce((a, b) => a > b ? a : b).toStringAsFixed(1)}%',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.green[600],
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Optimization Progress Chart
+              Container(
+                decoration: BoxDecoration(
+                  color: themeService.isDarkMode
+                      ? const Color(0xFF1A2742)
+                      : Colors.white,
+                  border: themeService.isDarkMode
+                      ? Border.all(
+                          color: const Color(0xFF4A90E2).withValues(alpha: 0.3),
+                          width: 1,
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: themeService.isDarkMode
+                          ? const Color(0xFF4A90E2).withValues(alpha: 0.15)
+                          : Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: themeService.isDarkMode
+                                  ? const Color(0xFF9C5AE0).withValues(alpha: 0.2)
+                                  : Colors.purple[50],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.trending_up_rounded,
+                              color: themeService.isDarkMode
+                                  ? const Color(0xFF9C5AE0)
+                                  : Colors.purple[600],
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Optimization Progress',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: themeService.isDarkMode
+                                    ? Colors.white
+                                    : Colors.grey[800],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Last 10 Optimizations',
+                        style: TextStyle(
+                          color: themeService.isDarkMode
+                              ? Colors.white60
+                              : Colors.grey[600],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 200,
+                        child: LineChart(
+                          LineChartData(
+                            lineTouchData: LineTouchData(
+                              touchTooltipData: LineTouchTooltipData(
+                                tooltipBgColor: themeService.isDarkMode
+                                    ? const Color(0xFF22334A)
+                                    : const Color.fromARGB(255, 246, 246, 246),
+                                tooltipRoundedRadius: 8,
+                                tooltipPadding: const EdgeInsets.all(8),
+                                getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                                  return touchedBarSpots.map((barSpot) {
+                                    return LineTooltipItem(
+                                      '${barSpot.y.toStringAsFixed(1)}%',
+                                      TextStyle(
+                                        color: themeService.isDarkMode
+                                            ? Colors.white
+                                            : const Color.fromARGB(255, 124, 37, 137),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    );
+                                  }).toList();
+                                },
+                              ),
+                            ),
+                            gridData: FlGridData(
+                              show: true,
+                              drawVerticalLine: false,
+                              horizontalInterval: 10,
+                              getDrawingHorizontalLine: (value) {
+                                return FlLine(
+                                  color: themeService.isDarkMode
+                                      ? Colors.white.withValues(alpha: 0.1)
+                                      : Colors.grey[200]!,
+                                  strokeWidth: 1,
+                                );
+                              },
+                            ),
+                            titlesData: FlTitlesData(
+                              show: true,
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: 30,
+                                  interval: 2,
+                                  getTitlesWidget: (value, meta) {
+                                    return Text(
+                                      '${value.toInt() + 1}',
+                                      style: TextStyle(
+                                        color: themeService.isDarkMode
+                                            ? Colors.white60
+                                            : Colors.grey[600],
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: 40,
+                                  interval: 10,
+                                  getTitlesWidget: (value, meta) {
+                                    return Text(
+                                      '${value.toInt()}%',
+                                      style: TextStyle(
+                                        color: themeService.isDarkMode
+                                            ? Colors.white60
+                                            : Colors.grey[600],
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            ),
+                            borderData: FlBorderData(
+                              show: true,
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: themeService.isDarkMode
+                                      ? Colors.white.withValues(alpha: 0.2)
+                                      : Colors.grey[300]!,
+                                ),
+                                left: BorderSide(
+                                  color: themeService.isDarkMode
+                                      ? Colors.white.withValues(alpha: 0.2)
+                                      : Colors.grey[300]!,
+                                ),
+                              ),
+                            ),
+                            minX: 0,
+                            maxX: 9,
+                            minY: 0,
+                            maxY: 50,
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: last10OptimizationPercents.asMap().entries.map((e) {
+                                  return FlSpot(e.key.toDouble(), e.value);
+                                }).toList(),
+                                isCurved: true,
+                                gradient: themeService.isDarkMode
+                                    ? const LinearGradient(
+                                        colors: [Color(0xFF9C5AE0), Color(0xFF4A90E2)],
+                                      )
+                                    : LinearGradient(
+                                        colors: [Colors.purple[400]!, Colors.purple[600]!],
+                                      ),
+                                barWidth: 3,
+                                isStrokeCapRound: true,
+                                dotData: FlDotData(
+                                  show: true,
+                                  getDotPainter: (spot, percent, barData, index) {
+                                    return FlDotCirclePainter(
+                                      radius: 4,
+                                      color: themeService.isDarkMode
+                                          ? const Color(0xFF9C5AE0)
+                                          : Colors.purple[600]!,
+                                      strokeWidth: 2,
+                                      strokeColor: themeService.isDarkMode
+                                          ? const Color(0xFF1A2742)
+                                          : Colors.white,
+                                    );
+                                  },
+                                ),
+                                belowBarData: BarAreaData(
+                                  show: true,
+                                  gradient: themeService.isDarkMode
+                                      ? LinearGradient(
+                                          colors: [
+                                            const Color(0xFF9C5AE0).withValues(alpha: 0.2),
+                                            const Color(0xFF4A90E2).withValues(alpha: 0.1),
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        )
+                                      : LinearGradient(
+                                          colors: [
+                                            Colors.purple[100]!.withValues(alpha: 0.3),
+                                            Colors.purple[50]!.withValues(alpha: 0.1),
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Average',
+                                style: TextStyle(
+                                  color: themeService.isDarkMode
+                                      ? Colors.white60
+                                      : Colors.grey[600],
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Text(
+                                '${(last10OptimizationPercents.reduce((a, b) => a + b) / last10OptimizationPercents.length).toStringAsFixed(1)}%',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: themeService.isDarkMode
+                                      ? const Color(0xFF9C5AE0)
+                                      : Colors.purple[600],
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                'Best',
+                                style: TextStyle(
+                                  color: themeService.isDarkMode
+                                      ? Colors.white60
+                                      : Colors.grey[600],
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Text(
+                                '${last10OptimizationPercents.reduce((a, b) => a > b ? a : b).toStringAsFixed(1)}%',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: themeService.isDarkMode
+                                      ? const Color(0xFF4A90E2)
+                                      : Colors.green[600],
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: _buildBottomNavigation(),
@@ -466,6 +605,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
   }
 
   Widget _buildBottomNavigation() {
+    final themeService = Provider.of<ThemeService>(context);
+
     return Consumer<MenuOptimizationService>(
       builder: (context, service, child) {
         List<Widget> navItems = [
@@ -485,10 +626,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
 
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: themeService.isDarkMode
+                ? const Color(0xFF1A2742)
+                : Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
+                color: themeService.isDarkMode
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),
@@ -510,18 +655,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
   }
 
   Widget _buildNavItem(int index, IconData icon, String label, MenuOptimizationService service) {
+    final themeService = Provider.of<ThemeService>(context);
     bool isSelected = _currentPage == index;
     bool canNavigate = _canNavigateToPage(index, service);
 
     Color backgroundColor = isSelected
-        ? (index == 0 ? Colors.blue[600]! : index == 1 ? Colors.blue[600]! : index == 2 ? Colors.green[600]! : Colors.purple[600]!)
+        ? (index == 0 ? const Color(0xFF4A90E2) : index == 1 ? const Color(0xFF4A90E2) : index == 2 ? Colors.green[600]! : Colors.purple[600]!)
         : Colors.transparent;
     Color iconColor = isSelected
         ? Colors.white
-        : canNavigate ? Colors.grey[600]! : Colors.grey[400]!;
+        : canNavigate
+            ? (themeService.isDarkMode ? Colors.white70 : Colors.grey[600]!)
+            : (themeService.isDarkMode ? Colors.white30 : Colors.grey[400]!);
     Color textColor = isSelected
         ? Colors.white
-        : canNavigate ? Colors.grey[700]! : Colors.grey[400]!;
+        : canNavigate
+            ? (themeService.isDarkMode ? Colors.white70 : Colors.grey[700]!)
+            : (themeService.isDarkMode ? Colors.white30 : Colors.grey[400]!);
 
     return Expanded(
       child: Material(

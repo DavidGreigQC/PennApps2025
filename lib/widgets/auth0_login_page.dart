@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../data/datasources/auth0_datasource.dart';
 import '../data/datasources/mongodb_datasource.dart';
 import '../services/local_stats_service.dart';
+import '../services/theme_service.dart';
 
 /// Auth0 Professional Login Page
 /// Best-in-class authentication for PennApps 2025
@@ -155,16 +156,15 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeService = Provider.of<ThemeService>(context);
+    final decoration = themeService.isDarkMode
+        ? ThemeService.darkGradientDecoration
+        : ThemeService.lightGradientDecoration;
+
     if (_isInitializing) {
       return Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.blue[900]!, Colors.blue[600]!],
-            ),
-          ),
+          decoration: decoration,
           child: const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -184,44 +184,53 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.blue[900]!, Colors.blue[600]!],
-          ),
-        ),
+        decoration: themeService.isDarkMode
+            ? decoration
+            : BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.blue[900]!, Colors.blue[600]!],
+                ),
+              ),
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // App Logo with translucent pill border
+                // App Logo with enhanced styling for dark mode
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(60),
+                    shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      width: 2,
+                      color: themeService.isDarkMode
+                          ? Colors.white.withValues(alpha: 0.15)
+                          : Colors.blue.withValues(alpha: 0.3),
+                      width: 3,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 20,
+                        color: themeService.isDarkMode
+                            ? const Color(0xFF4A90E2).withValues(alpha: 0.3)
+                            : Colors.blue.withValues(alpha: 0.2),
+                        blurRadius: 30,
+                        spreadRadius: 5,
                         offset: const Offset(0, 10),
                       ),
-                      BoxShadow(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        blurRadius: 30,
-                        offset: const Offset(0, 5),
-                      ),
+                      if (themeService.isDarkMode)
+                        BoxShadow(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          blurRadius: 40,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 5),
+                        ),
                     ],
                   ),
                   child: Image.asset(
                     'assets/images/menumaxlogo.png',
-                    height: 120,
+                    height: 140,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -229,9 +238,10 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
                 Text(
                   'Menu Max',
                   style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 36,
+                    fontWeight: FontWeight.w700,
                     color: Colors.white,
+                    letterSpacing: 1.2,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -255,9 +265,9 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.security, color: Colors.white, size: 16),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 10),
                       Text(
-                        'Powered by Auth0',
+                        'Auth0 Powered',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

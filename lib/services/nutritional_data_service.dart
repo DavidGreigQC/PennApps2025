@@ -2,10 +2,34 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import '../models/menu_item.dart';
 
 class NutritionalDataService {
   final Map<String, Map<String, dynamic>> _nutritionCache = {};
+  late GenerativeModel? _geminiModel;
+
+  /// Initialize Gemini AI model for nutritional estimation
+  NutritionalDataService() {
+    try {
+      // Get API key from environment or dart-define
+      const String? apiKey = String.fromEnvironment('GEMINI_API_KEY');
+
+      if (apiKey != null && apiKey.isNotEmpty && apiKey != 'YOUR_GEMINI_API_KEY') {
+        _geminiModel = GenerativeModel(
+          model: 'gemini-pro',
+          apiKey: apiKey,
+        );
+        debugPrint('✅ Gemini AI initialized for nutrition estimation');
+      } else {
+        _geminiModel = null;
+        debugPrint('⚠️  Gemini API key not found. Nutritional AI estimation disabled. Use --dart-define=GEMINI_API_KEY=your_key');
+      }
+    } catch (e) {
+      _geminiModel = null;
+      debugPrint('Warning: Gemini AI initialization failed: $e');
+    }
+  }
 
   /// CRITICAL: Only enrich existing menu items, never add new ones
 
@@ -75,6 +99,14 @@ class NutritionalDataService {
 
     if (nutritionData != null) {
       _nutritionCache[cacheKey] = nutritionData;
+      return _applyNutritionData(item, nutritionData);
+    }
+
+    // FORCE ESTIMATION: Use AI to estimate nutritional information when no online data found
+    nutritionData = await _estimateNutritionWithAI(item.name, restaurantName);
+    if (nutritionData != null) {
+      _nutritionCache[cacheKey] = nutritionData;
+      debugPrint('AI NUTRITION ESTIMATE: ${item.name} = $nutritionData (AI estimated)');
       return _applyNutritionData(item, nutritionData);
     }
 
@@ -351,5 +383,178 @@ class NutritionalDataService {
 
     // Default price for unknown items
     return 6.99;
+  }
+
+  /// FORCE ESTIMATION: Use Gemini AI to estimate nutritional information
+  Future<Map<String, dynamic>?> _estimateNutritionWithAI(String itemName, String? restaurantName) async {
+    // If Gemini AI is not available, fall back to enhanced generic estimation
+    if (_geminiModel == null) {
+      debugPrint('⚠️  Gemini AI not available, using enhanced generic estimation for $itemName');
+      return _enhancedGenericNutritionEstimate(itemName, restaurantName);
+    }
+
+    try {
+      String context = restaurantName != null
+          ? 'This is a menu item from $restaurantName restaurant'
+          : 'This is a generic menu item';
+
+      final prompt = '''
+You are a nutritional expert. Analyze the menu item "$itemName" and provide estimated nutritional information.
+
+$context
+
+Please provide realistic nutritional estimates in JSON format:
+{
+  "calories": <number>,
+  "protein": <number in grams>,
+  "carbs": <number in grams>,
+  "fat": <number in grams>,
+  "fiber": <number in grams>,
+  "sodium": <number in milligrams>,
+  "sugar": <number in grams>
+}
+
+Base your estimates on:
+1. Typical serving sizes for this type of food
+2. Common ingredients and preparation methods
+3. Restaurant vs. homemade preparation differences
+4. The specific restaurant's style if mentioned
+
+Return ONLY the JSON object, no explanations.
+''';
+
+      final content = [Content.text(prompt)];
+      final response = await _geminiModel!.generateContent(content);
+      final responseText = response.text?.trim() ?? '';
+
+      debugPrint('🤖 Gemini nutrition estimation for $itemName: $responseText');
+
+      return _parseNutritionResponse(responseText);
+
+    } catch (e) {
+      debugPrint('❌ Gemini nutrition estimation error for $itemName: $e');
+
+      // Fallback to enhanced generic estimation
+      return _enhancedGenericNutritionEstimate(itemName, restaurantName);
+    }
+  }
+
+  /// Parse Gemini's nutrition response
+  Map<String, dynamic>? _parseNutritionResponse(String responseText) {
+    try {
+      // Clean the response
+      String cleanedResponse = responseText
+          .replaceAll('```json', '')
+          .replaceAll('```', '')
+          .trim();
+
+      // Extract JSON if there's extra text
+      if (cleanedResponse.contains('{')) {
+        final jsonStart = cleanedResponse.indexOf('{');
+        final jsonEnd = cleanedResponse.lastIndexOf('}') + 1;
+        cleanedResponse = cleanedResponse.substring(jsonStart, jsonEnd);
+      }
+
+      final Map<String, dynamic> nutritionData = json.decode(cleanedResponse);
+
+      // Validate that we have reasonable values
+      if (nutritionData['calories'] != null && nutritionData['calories'] > 0) {
+        return nutritionData;
+      }
+
+      return null;
+    } catch (e) {
+      debugPrint('❌ Error parsing Gemini nutrition response: $e');
+      return null;
+    }
+  }
+
+  /// Enhanced generic nutrition estimation as final fallback
+  Map<String, dynamic> _enhancedGenericNutritionEstimate(String itemName, String? restaurantName) {
+    String lowerName = itemName.toLowerCase();
+    String lowerRestaurant = (restaurantName ?? '').toLowerCase();
+
+    // Enhanced estimation based on restaurant type and item type
+    Map<String, dynamic> baseNutrition = {};
+
+    // Fast food vs. casual dining adjustments
+    double calorieMultiplier = 1.0;
+    double sodiumMultiplier = 1.0;
+    double fatMultiplier = 1.0;
+
+    if (lowerRestaurant.contains('mcdonald') ||
+        lowerRestaurant.contains('burger king') ||
+        lowerRestaurant.contains('taco bell')) {
+      calorieMultiplier = 1.2;
+      sodiumMultiplier = 1.4;
+      fatMultiplier = 1.3;
+    }
+
+    // Item-specific estimations
+    if (lowerName.contains('salad')) {
+      baseNutrition = {
+        'calories': (180 * calorieMultiplier).round(),
+        'protein': 12.0,
+        'carbs': 18.0,
+        'fat': (8 * fatMultiplier).round(),
+        'fiber': 6.0,
+        'sodium': (450 * sodiumMultiplier).round(),
+        'sugar': 9.0,
+      };
+    } else if (lowerName.contains('pizza')) {
+      baseNutrition = {
+        'calories': (320 * calorieMultiplier).round(),
+        'protein': 14.0,
+        'carbs': 38.0,
+        'fat': (12 * fatMultiplier).round(),
+        'fiber': 3.0,
+        'sodium': (720 * sodiumMultiplier).round(),
+        'sugar': 6.0,
+      };
+    } else if (lowerName.contains('burger') || lowerName.contains('sandwich')) {
+      baseNutrition = {
+        'calories': (580 * calorieMultiplier).round(),
+        'protein': 28.0,
+        'carbs': 42.0,
+        'fat': (32 * fatMultiplier).round(),
+        'fiber': 4.0,
+        'sodium': (1100 * sodiumMultiplier).round(),
+        'sugar': 6.0,
+      };
+    } else if (lowerName.contains('chicken')) {
+      baseNutrition = {
+        'calories': (280 * calorieMultiplier).round(),
+        'protein': 35.0,
+        'carbs': 2.0,
+        'fat': (15 * fatMultiplier).round(),
+        'fiber': 0.0,
+        'sodium': (480 * sodiumMultiplier).round(),
+        'sugar': 0.0,
+      };
+    } else if (lowerName.contains('drink') || lowerName.contains('soda') || lowerName.contains('beverage')) {
+      baseNutrition = {
+        'calories': 150.0,
+        'protein': 0.0,
+        'carbs': 39.0,
+        'fat': 0.0,
+        'fiber': 0.0,
+        'sodium': 45.0,
+        'sugar': 39.0,
+      };
+    } else {
+      // Generic food item
+      baseNutrition = {
+        'calories': (380 * calorieMultiplier).round(),
+        'protein': 18.0,
+        'carbs': 32.0,
+        'fat': (20 * fatMultiplier).round(),
+        'fiber': 3.0,
+        'sodium': (680 * sodiumMultiplier).round(),
+        'sugar': 5.0,
+      };
+    }
+
+    debugPrint('📊 Enhanced generic nutrition estimate for $itemName: $baseNutrition');
+    return baseNutrition;
   }
 }

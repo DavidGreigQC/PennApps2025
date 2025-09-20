@@ -8,16 +8,28 @@ import '../../domain/entities/menu_item.dart';
 /// Gemini Vision API integration for superior OCR capabilities
 /// This replaces traditional OCR with AI-powered vision understanding
 class GeminiVisionDataSource {
-  static const String _apiKey = 'YOUR_GEMINI_API_KEY'; // Replace with actual API key
-  late GenerativeModel _model;
+  late GenerativeModel? _model;
 
   /// Initialize Gemini Vision model
   void initialize() {
-    _model = GenerativeModel(
-      model: 'gemini-pro-vision',
-      apiKey: _apiKey,
-    );
-    print('🤖 Gemini Vision initialized successfully!');
+    try {
+      // Get API key from environment or dart-define
+      const String? apiKey = String.fromEnvironment('GEMINI_API_KEY');
+
+      if (apiKey.isNotEmpty && apiKey != 'YOUR_GEMINI_API_KEY') {
+        _model = GenerativeModel(
+          model: 'gemini-pro-vision',
+          apiKey: apiKey,
+        );
+        print('🤖 Gemini Vision initialized successfully!');
+      } else {
+        _model = null;
+        print('⚠️  Gemini API key not found. Vision OCR disabled. Use --dart-define=GEMINI_API_KEY=your_key');
+      }
+    } catch (e) {
+      _model = null;
+      print('Warning: Gemini Vision initialization failed: $e');
+    }
   }
 
   /// **CAMERA OCR**: Extract menu items from camera image using Gemini Vision
@@ -59,6 +71,11 @@ class GeminiVisionDataSource {
   /// **AI MENU ANALYSIS**: Core Gemini Vision processing
   Future<List<MenuItem>> _analyzeMenuImage(Uint8List imageBytes) async {
     try {
+      if (_model == null) {
+        print('❌ Gemini Vision model not initialized');
+        return [];
+      }
+
       final prompt = TextPart('''
 Analyze this menu image and extract ALL menu items with their prices in JSON format.
 
@@ -84,7 +101,7 @@ If no menu items are found, return an empty array: []
       final imagePart = DataPart('image/jpeg', imageBytes);
       final content = [Content.multi([prompt, imagePart])];
 
-      final response = await _model.generateContent(content);
+      final response = await _model!.generateContent(content);
       final responseText = response.text?.trim() ?? '';
 
       print('🤖 Gemini Vision raw response: $responseText');
@@ -101,6 +118,10 @@ If no menu items are found, return an empty array: []
   /// Bonus feature for enhanced user experience
   Future<String> askAboutMenu(Uint8List imageBytes, String question) async {
     try {
+      if (_model == null) {
+        return 'Gemini Vision is not available. Please check your API key configuration.';
+      }
+
       final prompt = TextPart('''
 You are a helpful menu assistant. Look at this menu image and answer the user's question: "$question"
 
@@ -110,7 +131,7 @@ Provide a helpful, concise answer about the menu items, prices, or recommendatio
       final imagePart = DataPart('image/jpeg', imageBytes);
       final content = [Content.multi([prompt, imagePart])];
 
-      final response = await _model.generateContent(content);
+      final response = await _model!.generateContent(content);
       return response.text?.trim() ?? 'I could not analyze the menu image.';
 
     } catch (e) {
@@ -122,6 +143,10 @@ Provide a helpful, concise answer about the menu items, prices, or recommendatio
   /// **ENHANCED DESCRIPTION**: Get AI-generated descriptions for menu items
   Future<String> enhanceMenuItemDescription(String itemName, Uint8List imageBytes) async {
     try {
+      if (_model == null) {
+        return '';
+      }
+
       final prompt = TextPart('''
 Look at this menu image and find the item "$itemName".
 Provide a detailed, appetizing description of this menu item based on what you can see.
@@ -132,7 +157,7 @@ Keep it under 50 words and food-focused.
       final imagePart = DataPart('image/jpeg', imageBytes);
       final content = [Content.multi([prompt, imagePart])];
 
-      final response = await _model.generateContent(content);
+      final response = await _model!.generateContent(content);
       return response.text?.trim() ?? '';
 
     } catch (e) {

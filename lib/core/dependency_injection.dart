@@ -23,6 +23,8 @@ import '../services/ocr_service.dart';
 import '../services/nutritional_data_service.dart';
 import '../services/optimization_engine.dart';
 import '../services/menu_optimization_service.dart';
+import '../services/theme_service.dart';
+import '../services/locale_service.dart';
 
 /// Dependency injection setup for the application
 /// This is where we wire up all our dependencies
@@ -74,6 +76,14 @@ class DependencyInjection {
         // Legacy Services
         ChangeNotifierProvider<MenuOptimizationService>(
           create: (context) => MenuOptimizationService(),
+        ),
+
+        // Theme and Locale Services
+        ChangeNotifierProvider<ThemeService>(
+          create: (context) => ThemeService(),
+        ),
+        ChangeNotifierProvider<LocaleService>(
+          create: (context) => LocaleService(),
         ),
 
         // Controllers
