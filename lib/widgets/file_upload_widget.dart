@@ -197,6 +197,37 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                   children: [
                     Row(
                       children: [
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _clearAll,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.red[50],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.red[200]!, width: 1),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.clear_rounded, color: Colors.red[600], size: 16),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Clear All',
+                                    style: TextStyle(
+                                      color: Colors.red[600],
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
                         Icon(Icons.check_circle_rounded, color: Colors.green[600], size: 18),
                         const SizedBox(width: 8),
                         Expanded(
@@ -210,40 +241,6 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: _clearAll,
-                          borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.red[50],
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.red[200]!, width: 1),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.clear_rounded, color: Colors.red[600], size: 16),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Clear All',
-                                  style: TextStyle(
-                                    color: Colors.red[600],
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
                     ),
                     const SizedBox(height: 12),
                     ..._selectedFilesAndUrls.map((item) => _buildFileOrUrlItem(item)),

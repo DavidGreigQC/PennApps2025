@@ -72,18 +72,63 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Card(
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blue[50]!, Colors.blue[100]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withValues(alpha: 0.1),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
                     children: [
-                      Icon(Icons.restaurant_menu, size: 48, color: Theme.of(context).primaryColor),
-                      const SizedBox(height: 16),
-                      Text('Upload Menu Files', style: Theme.of(context).textTheme.headlineSmall),
-                      const SizedBox(height: 8),
-                      Text('Upload PDFs, images, or enter a menu URL to get started.',
-                          style: Theme.of(context).textTheme.bodyMedium),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[600],
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blue.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(Icons.restaurant_menu_rounded, size: 32, color: Colors.white),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Upload Menu Files',
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.blue[800],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Upload PDFs, images, or enter a menu URL to get started.',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Colors.blue[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -158,18 +203,63 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Card(
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.green[50]!, Colors.green[100]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
                 children: [
-                  Icon(Icons.tune, size: 48, color: Theme.of(context).primaryColor),
-                  const SizedBox(height: 16),
-                  Text('Optimization Criteria', style: Theme.of(context).textTheme.headlineSmall),
-                  const SizedBox(height: 8),
-                  Text('Set your preferences for finding the optimal menu items.',
-                      style: Theme.of(context).textTheme.bodyMedium),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.green[600],
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.green.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.tune_rounded, size: 32, color: Colors.white),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Optimization Criteria',
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.green[800],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Set your preferences for finding the optimal menu items.',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.green[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -240,27 +330,93 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Card(
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.purple[50]!, Colors.purple[100]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.purple.withValues(alpha: 0.1),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
                     children: [
-                      Icon(Icons.analytics, size: 48, color: Theme.of(context).primaryColor),
-                      const SizedBox(height: 16),
-                      Text('Optimization Results', style: Theme.of(context).textTheme.headlineSmall),
-                      const SizedBox(height: 8),
-                      if (service.isProcessing)
-                        Column(
-                          children: [
-                            const CircularProgressIndicator(),
-                            const SizedBox(height: 8),
-                            Text(service.status),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.purple[600],
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.purple.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
                           ],
-                        )
-                      else if (service.results.isNotEmpty)
-                        Text('Found ${service.results.length} optimal recommendations.',
-                            style: Theme.of(context).textTheme.bodyMedium),
+                        ),
+                        child: Icon(Icons.analytics_rounded, size: 32, color: Colors.white),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Optimization Results',
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.purple[800],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            if (service.isProcessing)
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.purple[600]!),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      service.status,
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                        color: Colors.purple[700],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            else if (service.results.isNotEmpty)
+                              Text(
+                                'Found ${service.results.length} optimal recommendations.',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.purple[700],
+                                ),
+                              )
+                            else
+                              Text(
+                                'Your optimization results will appear here.',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.purple[700],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),

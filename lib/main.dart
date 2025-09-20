@@ -26,10 +26,10 @@ class MenuOptimizerApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        initialRoute: '/welcome',
+        initialRoute: '/login',
         routes: {
-          '/welcome': (context) => WelcomeScreen(),
           '/login': (context) => const Auth0LoginPage(),
+          '/welcome': (context) => WelcomeScreen(),
           '/home': (context) => const HomeScreen(),
           '/test-caching': (context) => const DataCachingTestPage(),
         },
