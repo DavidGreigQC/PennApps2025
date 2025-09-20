@@ -9,7 +9,8 @@ import '../../domain/entities/optimization_result.dart';
 /// This creates a shared intelligence system that gets smarter with each user
 class MongoDBDataSource {
   static const String _connectionString =
-      'mongodb+srv://davidg9700_db_user:wtks6otRGbIfTmF5@cluster0.mafofei.mongodb.net/menu_optimizer?retryWrites=true&w=majority&appName=Cluster0';
+      String.fromEnvironment('MONGODB_CONNECTION_STRING',
+        defaultValue: 'mongodb://localhost:27017/menu_optimizer'); // Fallback for development
 
   Db? _db;
   DbCollection? _menusCollection;

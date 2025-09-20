@@ -81,12 +81,16 @@ static const String _clientId = 'YOUR_AUTH0_CLIENT_ID'; // Your actual client ID
    mongodb+srv://pennapps_user:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
    ```
 
-### Step 4: Update Your Code
-Replace in `/lib/data/datasources/mongodb_datasource.dart` line 11-12:
-```dart
-static const String _connectionString =
-    'mongodb+srv://pennapps_user:YOUR_ACTUAL_PASSWORD@cluster0.xxxxx.mongodb.net/menu_optimizer?retryWrites=true&w=majority';
+### Step 4: Set Environment Variable
+Add your MongoDB connection string as an environment variable:
+
+**For development:**
+```bash
+export MONGODB_CONNECTION_STRING="mongodb+srv://pennapps_user:YOUR_ACTUAL_PASSWORD@cluster0.xxxxx.mongodb.net/menu_optimizer?retryWrites=true&w=majority"
 ```
+
+**For production/deployment:**
+Set `MONGODB_CONNECTION_STRING` in your deployment environment variables.
 
 ### Step 5: Database Collections (Auto-Created)
 The app automatically creates these collections:
