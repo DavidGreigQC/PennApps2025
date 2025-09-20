@@ -8,6 +8,7 @@ import '../services/menu_optimization_service.dart';
 import '../models/optimization_criteria.dart';
 import '../widgets/file_upload_widget.dart';
 import '../widgets/optimization_form_widget.dart';
+import 'welcome_screen.dart';
 import '../widgets/results_display_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -71,13 +72,16 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           ),
         ],
       ),
-      body: IndexedStack(
-        index: _currentPage,
-        children: [
-          _buildUploadPage(),
-          _buildOptimizationPage(),
-          _buildResultsPage(),
-        ],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        child: _currentPage == 0
+            ? Container(key: const ValueKey(0), child: _buildUploadPage())
+            : _currentPage == 1
+                ? Container(key: const ValueKey(1), child: _buildOptimizationPage())
+                : Container(key: const ValueKey(2), child: _buildResultsPage()),
       ),
       bottomNavigationBar: _buildBottomNavigation(),
     );
@@ -526,11 +530,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildNavItem(0, Icons.upload_file_rounded, 'Upload', service),
-                  _buildNavItem(1, Icons.tune_rounded, 'Optimize', service),
-                  _buildNavItem(2, Icons.analytics_rounded, 'Results', service),
-                ],
+                children: _buildNavItems(service),
               ),
             ),
           ),
@@ -539,12 +539,31 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     );
   }
 
+  List<Widget> _buildNavItems(MenuOptimizationService service) {
+    List<Widget> navItems = [
+      _buildNavItem(0, Icons.home_rounded, 'Home', service),
+      _buildNavItem(1, Icons.upload_file_rounded, 'Upload', service),
+    ];
+
+    // Add Optimize tab if files are uploaded
+    if (_uploadedFilesAndUrls.isNotEmpty) {
+      navItems.add(_buildNavItem(2, Icons.tune_rounded, 'Optimize', service));
+    }
+
+    // Add Results tab if optimization has started
+    if (service.results.isNotEmpty || service.isProcessing || service.status.isNotEmpty) {
+      navItems.add(_buildNavItem(3, Icons.analytics_rounded, 'Results', service));
+    }
+
+    return navItems;
+  }
+
   Widget _buildNavItem(int index, IconData icon, String label, MenuOptimizationService service) {
-    bool isSelected = _currentPage == index;
+    bool isSelected = (index == 0) ? false : _currentPage == (index - 1);
     bool canNavigate = _canNavigateToPage(index, service);
 
     Color backgroundColor = isSelected
-        ? (index == 0 ? Colors.blue[600]! : index == 1 ? Colors.green[600]! : Colors.purple[600]!)
+        ? (index == 1 ? Colors.blue[600]! : index == 2 ? Colors.green[600]! : Colors.purple[600]!)
         : Colors.transparent;
     Color iconColor = isSelected
         ? Colors.white
@@ -558,10 +577,23 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
         color: Colors.transparent,
         child: InkWell(
           onTap: canNavigate ? () {
-            setState(() {
-              _currentPage = index;
-            });
-            _updateBreadcrumbs();
+            if (index == 0) {
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const WelcomeScreen(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  transitionDuration: const Duration(milliseconds: 300),
+                ),
+              );
+            } else {
+              setState(() {
+                _currentPage = index - 1;
+              });
+              _updateBreadcrumbs();
+            }
           } : null,
           borderRadius: BorderRadius.circular(16),
           child: Container(
@@ -605,10 +637,12 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   bool _canNavigateToPage(int page, MenuOptimizationService service) {
     switch (page) {
       case 0:
-        return true;
+        return true; // Home/Welcome is always accessible
       case 1:
-        return _uploadedFilesAndUrls.isNotEmpty;
+        return true; // Upload is always accessible
       case 2:
+        return _uploadedFilesAndUrls.isNotEmpty; // Optimize needs uploaded files
+      case 3:
         return _optimizationRequest != null &&
             (service.results.isNotEmpty || service.isProcessing || service.status.isNotEmpty);
       default:
@@ -618,7 +652,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
 
   void _goToOptimizationPage() {
     setState(() {
-      _currentPage = 1;
+      _currentPage = 1; // Optimize page is now index 1 (was 1, now 2-1)
     });
   }
 
@@ -626,7 +660,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     if (_optimizationRequest == null || _uploadedFilesAndUrls.isEmpty) return;
 
     setState(() {
-      _currentPage = 2;
+      _currentPage = 2; // Results page is now index 2 (was 2, now 3-1)
     });
 
     final service = Provider.of<MenuOptimizationService>(context, listen: false);

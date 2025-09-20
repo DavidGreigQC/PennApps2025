@@ -29,7 +29,7 @@ class MenuOptimizerApp extends StatelessWidget {
         initialRoute: '/login',
         routes: {
           '/login': (context) => const Auth0LoginPage(),
-          '/welcome': (context) => WelcomeScreen(),
+          '/welcome': (context) => const WelcomeScreen(),
           '/home': (context) => const HomeScreen(),
           '/test-caching': (context) => const DataCachingTestPage(),
         },
