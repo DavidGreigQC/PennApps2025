@@ -29,32 +29,79 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.list), text: 'Rankings'),
-            Tab(icon: Icon(Icons.scatter_plot), text: 'Analysis'),
-          ],
-        ),
-        SizedBox(
-          height: 600,
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              _buildRankingsTab(),
-              _buildAnalysisTab(),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
-        ),
-      ],
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              labelColor: Colors.blue[700],
+              unselectedLabelColor: Colors.grey[600],
+              indicatorColor: Colors.blue[700],
+              indicatorWeight: 3,
+              dividerColor: Colors.transparent,
+              tabs: [
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.list_rounded, size: 20),
+                      const SizedBox(width: 8),
+                      const Text('Rankings', style: TextStyle(fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.analytics_rounded, size: 20),
+                      const SizedBox(width: 8),
+                      const Text('Analysis', style: TextStyle(fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.45,
+            child: TabBarView(
+              controller: _tabController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                _buildRankingsTab(),
+                _buildAnalysisTab(),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildRankingsTab() {
     return ListView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(16),
       itemCount: widget.results.length,
       itemBuilder: (context, index) {
         return _buildResultCard(widget.results[index], index + 1);
@@ -63,93 +110,307 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
   }
 
   Widget _buildResultCard(OptimizationResult result, int rank) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: Colors.grey[200]!, width: 1),
+      ),
       child: ExpansionTile(
-        leading: CircleAvatar(
-          backgroundColor: _getRankColor(rank),
-          child: Text(
-            '#$rank',
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        childrenPadding: EdgeInsets.zero,
+        leading: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: _getRankColor(rank),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: _getRankColor(rank).withValues(alpha: 0.3),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              '#$rank',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
             ),
           ),
         ),
         title: Text(
           result.menuItem.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            color: Colors.black87,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('\$${result.menuItem.price.toStringAsFixed(2)}'),
-            const SizedBox(height: 4),
-            LinearProgressIndicator(
-              value: result.optimizationScore,
-              backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(_getRankColor(rank)),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.green[200]!, width: 1),
+              ),
+              child: Text(
+                '\$${result.menuItem.price.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.green[700],
+                  fontSize: 13,
+                ),
+              ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Score: ${(result.optimizationScore * 100).toStringAsFixed(1)}%',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: _getRankColor(rank).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: _getRankColor(rank).withValues(alpha: 0.3), width: 1),
+              ),
+              child: Text(
+                'Score: ${(result.optimizationScore * 100).toStringAsFixed(1)}%',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: _getRankColor(rank),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 6,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(3),
+              ),
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: result.optimizationScore,
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: _getRankColor(rank),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (result.menuItem.description != null) ...[
-                  Text(
-                    'Description',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(result.menuItem.description!),
-                  const SizedBox(height: 12),
-                ],
-                Text(
-                  'Nutritional Information',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 8),
-                _buildNutritionGrid(result.menuItem),
-                const SizedBox(height: 12),
-                Text(
-                  'Optimization Scores',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 8),
-                ...result.criteriaScores.entries.map((entry) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Container(
+            margin: const EdgeInsets.only(top: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (result.menuItem.description != null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.blue[200]!, width: 1),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.description_rounded, color: Colors.blue[600], size: 18),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Description',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.blue[700],
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            result.menuItem.description!,
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green[200]!, width: 1),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(_formatCriteriaName(entry.key)),
+                        Row(
+                          children: [
+                            Icon(Icons.local_dining_rounded, color: Colors.green[600], size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Nutritional Information',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.green[700],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        _buildNutritionGrid(result.menuItem),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.purple[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.purple[200]!, width: 1),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.analytics_rounded, color: Colors.purple[600], size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Optimization Scores',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.purple[700],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        ...result.criteriaScores.entries.map((entry) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 4),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey[200]!, width: 1),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    _formatCriteriaName(entry.key),
+                                    style: const TextStyle(fontWeight: FontWeight.w500),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.purple[100],
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    entry.value.toStringAsFixed(2),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.purple[700],
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.orange[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.orange[200]!, width: 1),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.lightbulb_rounded, color: Colors.orange[600], size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Why This Item?',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.orange[700],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
                         Text(
-                          entry.value.toStringAsFixed(2),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          result.reasoning,
+                          style: TextStyle(color: Colors.grey[700]),
                         ),
                       ],
                     ),
-                  );
-                }),
-                const SizedBox(height: 12),
-                Text(
-                  'Why This Item?',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 4),
-                Text(result.reasoning),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -173,45 +434,51 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
         MapEntry('Sodium', '${item.sodium!.toInt()}mg'),
     ];
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: nutritionData.length,
-      itemBuilder: (context, index) {
-        MapEntry<String, String> data = nutritionData[index];
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: nutritionData.map((data) {
         return Container(
-          padding: const EdgeInsets.all(8),
+          width: (MediaQuery.of(context).size.width - 64) / 3,
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: Colors.white,
             borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey[200]!, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 data.value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 12,
+                  fontSize: 14,
+                  color: Colors.green[700],
                 ),
+                textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 8),
               Text(
                 data.key,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
                   color: Colors.grey[600],
                 ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
         );
-      },
+      }).toList(),
     );
   }
 
@@ -243,23 +510,19 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
             child: _buildParetoChart(),
           ),
           const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Summary Statistics',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              ElevatedButton.icon(
-                onPressed: _showSourcesDialog,
-                icon: const Icon(Icons.source, size: 16),
-                label: const Text('Show Sources'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[50],
-                  foregroundColor: Colors.blue[700],
-                ),
-              ),
-            ],
+          Text(
+            'Summary Statistics',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton.icon(
+            onPressed: _showSourcesDialog,
+            icon: const Icon(Icons.source, size: 16),
+            label: const Text('Show Sources'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue[50],
+              foregroundColor: Colors.blue[700],
+            ),
           ),
           const SizedBox(height: 12),
           _buildSummaryStats(),
@@ -365,22 +628,51 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
   }
 
   Widget _buildStatCard(String label, String value) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(label),
-            Text(
-              value,
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              label,
               style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.blue[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.blue[200]!, width: 1),
+            ),
+            child: Text(
+              value,
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 14,
+                color: Colors.blue[700],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -410,12 +702,17 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
             children: [
               Icon(Icons.source, color: Colors.blue),
               SizedBox(width: 8),
-              Text('Data Sources & Verification'),
+              Expanded(
+                child: Text(
+                  'Data Sources',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
           content: SizedBox(
             width: double.maxFinite,
-            height: 400,
+            height: MediaQuery.of(context).size.height * 0.7,
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -435,13 +732,7 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
                     Icons.verified,
                     Colors.green,
                   ),
-                  _buildSourceCard(
-                    'McDonald\'s Official Nutrition',
-                    'https://www.mcdonalds.com/us/en-us/about-our-food/nutrition-calculator.html',
-                    'Official McDonald\'s nutrition calculator and ingredient information.',
-                    Icons.restaurant,
-                    Colors.orange,
-                  ),
+                  ..._buildRestaurantSpecificSources(),
                   _buildSourceCard(
                     'Edamam Food Database API',
                     'https://developer.edamam.com/food-database-api',
@@ -511,6 +802,100 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
         );
       },
     );
+  }
+
+  List<Widget> _buildRestaurantSpecificSources() {
+    String detectedRestaurant = _detectRestaurant();
+
+    switch (detectedRestaurant.toLowerCase()) {
+      case 'dominos':
+        return [
+          _buildSourceCard(
+            'Domino\'s Official Nutrition',
+            'https://www.dominos.com/en/pages/order/menu/nutritional-information/',
+            'Official Domino\'s nutritional information and ingredients.',
+            Icons.restaurant,
+            Colors.orange,
+          ),
+        ];
+      case 'mcdonalds':
+        return [
+          _buildSourceCard(
+            'McDonald\'s Official Nutrition',
+            'https://www.mcdonalds.com/us/en-us/about-our-food/nutrition-calculator.html',
+            'Official McDonald\'s nutrition calculator and ingredient information.',
+            Icons.restaurant,
+            Colors.orange,
+          ),
+        ];
+      case 'burger king':
+        return [
+          _buildSourceCard(
+            'Burger King Official Nutrition',
+            'https://www.bk.com/nutrition',
+            'Official Burger King nutritional information and allergen data.',
+            Icons.restaurant,
+            Colors.orange,
+          ),
+        ];
+      case 'taco bell':
+        return [
+          _buildSourceCard(
+            'Taco Bell Official Nutrition',
+            'https://www.tacobell.com/nutrition/info',
+            'Official Taco Bell nutrition facts and ingredient information.',
+            Icons.restaurant,
+            Colors.orange,
+          ),
+        ];
+      default:
+        return [
+          _buildSourceCard(
+            'Generic Restaurant Database',
+            'https://www.nutritionix.com/business/api',
+            'Generic restaurant nutritional data from Nutritionix database.',
+            Icons.restaurant,
+            Colors.orange,
+          ),
+        ];
+    }
+  }
+
+  String _detectRestaurant() {
+    if (widget.results.isEmpty) return 'unknown';
+
+    String allItems = widget.results
+        .map((result) => result.menuItem.name.toLowerCase())
+        .join(' ');
+
+    if (allItems.contains('bread bites') ||
+        allItems.contains('parmesan') ||
+        allItems.contains('stuffed cheese') ||
+        allItems.contains('garlic bread')) {
+      return 'dominos';
+    }
+
+    if (allItems.contains('big mac') ||
+        allItems.contains('mcchicken') ||
+        allItems.contains('quarter pounder') ||
+        allItems.contains('mcnugget')) {
+      return 'mcdonalds';
+    }
+
+    if (allItems.contains('whopper') ||
+        allItems.contains('chicken fries') ||
+        allItems.contains('impossible burger')) {
+      return 'burger king';
+    }
+
+    if (allItems.contains('crunchwrap') ||
+        allItems.contains('chalupa') ||
+        allItems.contains('quesadilla') ||
+        allItems.contains('burrito supreme')) {
+      return 'taco bell';
+    }
+
+    return 'unknown';
   }
 
   Widget _buildSourceCard(String title, String url, String description, IconData icon, Color color) {

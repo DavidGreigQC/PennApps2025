@@ -22,108 +22,231 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Upload Options Header
-            Text(
-              'Choose Upload Method:',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Four upload option buttons
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 110,
-                    child: _buildUploadOption(
-                      icon: Icons.camera_alt,
-                      title: 'Camera',
-                      subtitle: 'Take Photo',
-                      onTap: _takePhoto,
-                    ),
+            // Header Section
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(width: 6),
-                  SizedBox(
-                    width: 110,
-                    child: _buildUploadOption(
-                      icon: Icons.photo_library,
-                      title: 'Photos',
-                      subtitle: 'Gallery',
-                      onTap: _pickFromGallery,
-                    ),
+                  child: Icon(
+                    Icons.upload_rounded,
+                    color: Colors.blue[600],
+                    size: 20,
                   ),
-                  const SizedBox(width: 6),
-                  SizedBox(
-                    width: 110,
-                    child: _buildUploadOption(
-                      icon: Icons.upload_file,
-                      title: 'Files',
-                      subtitle: 'PDF/Image',
-                      onTap: _pickFiles,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // URL input
-            TextField(
-              controller: _urlController,
-              decoration: InputDecoration(
-                labelText: 'Or enter menu URL',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: _addUrl,
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Upload Menu Files',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Upload Options Section
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!, width: 1),
               ),
-              keyboardType: TextInputType.url,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.camera_alt_rounded, color: Colors.blue[600], size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Upload Methods',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[700],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildUploadOption(
+                          icon: Icons.camera_alt_rounded,
+                          title: 'Camera',
+                          subtitle: 'Take Photo',
+                          color: Colors.green,
+                          onTap: _takePhoto,
+                        ),
+                        const SizedBox(width: 12),
+                        _buildUploadOption(
+                          icon: Icons.photo_library_rounded,
+                          title: 'Gallery',
+                          subtitle: 'Photos',
+                          color: Colors.orange,
+                          onTap: _pickFromGallery,
+                        ),
+                        const SizedBox(width: 12),
+                        _buildUploadOption(
+                          icon: Icons.upload_file_rounded,
+                          title: 'Files',
+                          subtitle: 'PDF/Image',
+                          color: Colors.purple,
+                          onTap: _pickFiles,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
 
-            // List of selected files/URLs
-            if (_selectedFilesAndUrls.isNotEmpty) ...[
-              Text(
-                'Selected Files / URLs:',
-                style: Theme.of(context).textTheme.titleMedium,
+            // URL Input Section
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.blue[200]!, width: 1),
               ),
-              const SizedBox(height: 8),
-              ..._selectedFilesAndUrls.map((item) => _buildFileOrUrlItem(item)),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: _takePhoto,
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text('Camera'),
+                  Row(
+                    children: [
+                      Icon(Icons.link_rounded, color: Colors.blue[600], size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Menu URL',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blue[700],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
-                  ElevatedButton.icon(
-                    onPressed: _pickFromGallery,
-                    icon: const Icon(Icons.photo_library),
-                    label: const Text('Photos'),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: _pickFiles,
-                    icon: const Icon(Icons.upload_file),
-                    label: const Text('Files'),
-                  ),
-                  TextButton.icon(
-                    onPressed: _clearAll,
-                    icon: const Icon(Icons.clear),
-                    label: const Text('Clear All'),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _urlController,
+                    decoration: InputDecoration(
+                      labelText: 'Enter menu website URL',
+                      hintText: 'https://example.com/menu',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      prefixIcon: Icon(Icons.language_rounded, color: Colors.grey[500]),
+                      suffixIcon: Container(
+                        margin: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[600],
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                          onPressed: _addUrl,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    ),
+                    keyboardType: TextInputType.url,
                   ),
                 ],
+              ),
+            ),
+
+            // Selected Files Section
+            if (_selectedFilesAndUrls.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green[200]!, width: 1),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle_rounded, color: Colors.green[600], size: 18),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Selected Files (${_selectedFilesAndUrls.length})',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.green[700],
+                            fontSize: 14,
+                          ),
+                        ),
+                        const Spacer(),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _clearAll,
+                            borderRadius: BorderRadius.circular(6),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.red[50],
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: Colors.red[200]!, width: 1),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.clear_rounded, color: Colors.red[600], size: 14),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Clear All',
+                                    style: TextStyle(
+                                      color: Colors.red[600],
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    ..._selectedFilesAndUrls.map((item) => _buildFileOrUrlItem(item)),
+                  ],
+                ),
               ),
             ],
           ],
@@ -134,20 +257,85 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
 
   Widget _buildFileOrUrlItem(String item) {
     bool isUrl = item.startsWith('http');
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 2),
-      child: ListTile(
-        leading: Icon(isUrl ? Icons.link : Icons.insert_drive_file),
-        title: Text(isUrl ? item : item.split('/').last),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () {
-            setState(() {
-              _selectedFilesAndUrls.remove(item);
-            });
-            widget.onFilesSelected(_selectedFilesAndUrls);
-          },
-        ),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[200]!, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: isUrl ? Colors.blue[50] : Colors.green[50],
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              isUrl ? Icons.link_rounded : Icons.insert_drive_file_rounded,
+              color: isUrl ? Colors.blue[600] : Colors.green[600],
+              size: 16,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isUrl ? 'Website URL' : 'File',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isUrl ? item : item.split('/').last,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  _selectedFilesAndUrls.remove(item);
+                });
+                widget.onFilesSelected(_selectedFilesAndUrls);
+              },
+              borderRadius: BorderRadius.circular(6),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: Colors.red[600],
+                  size: 16,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -207,33 +395,63 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
     required IconData icon,
     required String title,
     required String subtitle,
+    required MaterialColor color,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        height: 100,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!, width: 2),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: Theme.of(context).primaryColor),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            color: color[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color[200]!, width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
-            ),
-          ],
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  size: 24,
+                  color: color[700],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                  color: color[700],
+                ),
+              ),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: color[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

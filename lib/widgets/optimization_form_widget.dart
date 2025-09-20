@@ -59,17 +59,54 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildRestaurantInfoSection(),
-          const SizedBox(height: 16),
           _buildCriteriaSection(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildConstraintsSection(),
-          const SizedBox(height: 16),
-          _buildNotesSection(),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _submitForm,
-            child: const Text('Set Optimization Criteria'),
+          const SizedBox(height: 20),
+          _buildRestaurantInfoSection(),
+          const SizedBox(height: 20),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.orange[600]!, Colors.orange[700]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ElevatedButton(
+              onPressed: _submitForm,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.settings_rounded, size: 20),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Set Optimization Criteria',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -77,43 +114,109 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
   }
 
   Widget _buildRestaurantInfoSection() {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Restaurant Information (Optional)',
-              style: Theme.of(context).textTheme.titleMedium,
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.amber[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.store_rounded,
+                    color: Colors.amber[700],
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Restaurant Information',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Optional',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
             TextFormField(
               controller: _restaurantNameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Restaurant Name',
                 hintText: 'e.g., McDonald\'s, Chipotle',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey[50],
+                prefixIcon: Icon(Icons.restaurant_rounded, color: Colors.grey[500]),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
-              textInputAction: TextInputAction.done,
+              textInputAction: TextInputAction.next,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _restaurantLocationController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Location',
                 hintText: 'e.g., New York, NY',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey[50],
+                prefixIcon: Icon(Icons.location_on_rounded, color: Colors.grey[500]),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
-              textInputAction: TextInputAction.done,
+              textInputAction: TextInputAction.next,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _websiteController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Website URL',
                 hintText: 'https://example.com',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey[50],
+                prefixIcon: Icon(Icons.language_rounded, color: Colors.grey[500]),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
               textInputAction: TextInputAction.done,
               validator: (value) {
@@ -133,26 +236,69 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
   }
 
   Widget _buildCriteriaSection() {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Optimization Criteria',
-                  style: Theme.of(context).textTheme.titleMedium,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.purple[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.psychology_rounded,
+                    color: Colors.purple[600],
+                    size: 20,
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: _addCriteria,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Optimization Goals',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _addCriteria,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.add_rounded,
+                        color: Colors.green[600],
+                        size: 20,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             ..._criteria.map((criteria) => _buildCriteriaItem(criteria)),
           ],
         ),
@@ -161,94 +307,287 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
   }
 
   Widget _buildCriteriaItem(CriteriaItem criteria) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header Row with Dropdown and Delete Button
             Row(
               children: [
-                Expanded(
-                  child: DropdownButtonFormField<CriteriaOption>(
-                    initialValue: criteria.option,
-                    decoration: const InputDecoration(
-                      labelText: 'Criteria',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: _availableCriteria.map((option) {
-                      return DropdownMenuItem(
-                        value: option,
-                        child: Text(option.displayName),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        criteria.option = value!;
-                      });
-                    },
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.purple[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.track_changes_rounded,
+                    color: Colors.purple[600],
+                    size: 20,
                   ),
                 ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () => _removeCriteria(criteria),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[200]!, width: 1),
+                    ),
+                    child: DropdownButtonFormField<CriteriaOption>(
+                      initialValue: criteria.option,
+                      decoration: const InputDecoration(
+                        labelText: 'Optimization Goal',
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      isExpanded: true,
+                      items: _availableCriteria.map((option) {
+                        return DropdownMenuItem(
+                          value: option,
+                          child: Text(
+                            option.displayName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          criteria.option = value!;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _removeCriteria(criteria),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.red[50],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.delete_outline_rounded,
+                        color: Colors.red[600],
+                        size: 20,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              criteria.option.description,
-              style: Theme.of(context).textTheme.bodySmall,
+            const SizedBox(height: 16),
+
+            // Description
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue[200]!, width: 1),
+              ),
+              child: Text(
+                criteria.option.description,
+                style: TextStyle(
+                  color: Colors.blue[700],
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 20),
+
+            // Weight Slider Section
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.green[200]!, width: 1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Text('Weight: ${criteria.weight.toStringAsFixed(1)}'),
-                      Slider(
-                        value: criteria.weight,
-                        min: 0.1,
-                        max: 2.0,
-                        divisions: 19,
-                        onChanged: (value) {
-                          setState(() {
-                            criteria.weight = value;
-                          });
-                        },
+                      Icon(Icons.tune_rounded, color: Colors.green[600], size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Importance Weight',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.green[700],
+                          fontSize: 14,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.green[100],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          criteria.weight.toStringAsFixed(1),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.green[700],
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  children: [
-                    const Text('Goal'),
-                    ToggleButtons(
+                  const SizedBox(height: 12),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: Colors.green[400],
+                      inactiveTrackColor: Colors.green[200],
+                      thumbColor: Colors.green[600],
+                      overlayColor: Colors.green[200]?.withValues(alpha: 0.3),
+                      trackHeight: 6.0,
+                    ),
+                    child: Slider(
+                      value: criteria.weight,
+                      min: 0.1,
+                      max: 2.0,
+                      divisions: 19,
+                      onChanged: (value) {
+                        setState(() {
+                          criteria.weight = value;
+                        });
+                      },
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Low (0.1)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.green[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        'High (2.0)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.green[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Goal Toggle Section
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.orange[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange[200]!, width: 1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.flag_rounded, color: Colors.orange[600], size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Optimization Goal',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.orange[700],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.orange[200]!, width: 1),
+                    ),
+                    child: ToggleButtons(
                       isSelected: [criteria.isMaximize, !criteria.isMaximize],
                       onPressed: (index) {
                         setState(() {
                           criteria.isMaximize = index == 0;
                         });
                       },
-                      children: const [
+                      borderRadius: BorderRadius.circular(8),
+                      selectedColor: Colors.white,
+                      fillColor: Colors.orange[500],
+                      color: Colors.orange[600],
+                      constraints: const BoxConstraints(minHeight: 44, minWidth: 100),
+                      children: [
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Text('Max'),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.trending_up_rounded, size: 16),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Maximize',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Text('Min'),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.trending_down_rounded, size: 16),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Minimize',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -257,85 +596,229 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
   }
 
   Widget _buildConstraintsSection() {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Constraints (Optional)',
-              style: Theme.of(context).textTheme.titleMedium,
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.filter_alt_rounded,
+                    color: Colors.red[600],
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Dietary Constraints',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _maxPriceController,
-              decoration: const InputDecoration(
-                labelText: 'Maximum Price',
-                hintText: '15.00',
-                prefixText: '\$',
-                border: OutlineInputBorder(),
+            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!, width: 1),
               ),
-              keyboardType: TextInputType.number,
-              textInputAction: TextInputAction.done,
-              validator: (value) {
-                if (value != null && value.isNotEmpty) {
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid price';
-                  }
-                }
-                return null;
-              },
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.attach_money, color: Colors.green[600], size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Budget',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[700],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _maxPriceController,
+                      decoration: InputDecoration(
+                        labelText: 'Maximum Price',
+                        hintText: '15.00',
+                        prefixText: '\$',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                      ),
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
+                      validator: (value) {
+                        if (value != null && value.isNotEmpty) {
+                          if (double.tryParse(value) == null) {
+                            return 'Please enter a valid price';
+                          }
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Allergen Restrictions',
-              style: Theme.of(context).textTheme.titleSmall,
+            const SizedBox(height: 16),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.orange[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange[200]!, width: 1),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.warning_rounded, color: Colors.orange[600], size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Allergen Restrictions',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[700],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _availableAllergens.map((allergen) {
+                        bool isSelected = _selectedAllergens.contains(allergen);
+                        return FilterChip(
+                          label: Text(
+                            allergen,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          selected: isSelected,
+                          selectedColor: Colors.orange[200],
+                          backgroundColor: Colors.white,
+                          side: BorderSide(
+                            color: isSelected ? Colors.orange[400]! : Colors.grey[300]!,
+                            width: 1,
+                          ),
+                          onSelected: (selected) {
+                            setState(() {
+                              if (selected) {
+                                _selectedAllergens.add(allergen);
+                              } else {
+                                _selectedAllergens.remove(allergen);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: _availableAllergens.map((allergen) {
-                bool isSelected = _selectedAllergens.contains(allergen);
-                return FilterChip(
-                  label: Text(allergen),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        _selectedAllergens.add(allergen);
-                      } else {
-                        _selectedAllergens.remove(allergen);
-                      }
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Dietary Restrictions',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: _availableDietaryRestrictions.map((restriction) {
-                bool isSelected = _selectedDietaryRestrictions.contains(restriction);
-                return FilterChip(
-                  label: Text(restriction),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        _selectedDietaryRestrictions.add(restriction);
-                      } else {
-                        _selectedDietaryRestrictions.remove(restriction);
-                      }
-                    });
-                  },
-                );
-              }).toList(),
+            const SizedBox(height: 16),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.blue[200]!, width: 1),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.eco_rounded, color: Colors.blue[600], size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Dietary Preferences',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[700],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _availableDietaryRestrictions.map((restriction) {
+                        bool isSelected = _selectedDietaryRestrictions.contains(restriction);
+                        return FilterChip(
+                          label: Text(
+                            restriction,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          selected: isSelected,
+                          selectedColor: Colors.blue[200],
+                          backgroundColor: Colors.white,
+                          side: BorderSide(
+                            color: isSelected ? Colors.blue[400]! : Colors.grey[300]!,
+                            width: 1,
+                          ),
+                          onSelected: (selected) {
+                            setState(() {
+                              if (selected) {
+                                _selectedDietaryRestrictions.add(restriction);
+                              } else {
+                                _selectedDietaryRestrictions.remove(restriction);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -343,32 +826,6 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
     );
   }
 
-  Widget _buildNotesSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Additional Notes',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _notesController,
-              decoration: const InputDecoration(
-                hintText: 'Any specific preferences or requirements...',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-              textInputAction: TextInputAction.done,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   void _addCriteria() {
     if (_criteria.length < _availableCriteria.length) {
