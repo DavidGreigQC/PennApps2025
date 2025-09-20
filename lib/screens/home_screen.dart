@@ -17,18 +17,22 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {
   int _currentPage = 0;
   List<String> _uploadedFilesAndUrls = [];
   OptimizationRequest? _optimizationRequest;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          'Menu Optimizer',
+          'Menu Max',
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 20,
@@ -59,41 +63,32 @@ class _HomeScreenState extends State<HomeScreen> {
               tooltip: 'Test Data Caching',
             ),
           ),
-          if (_currentPage > 0)
-            Container(
-              margin: const EdgeInsets.only(right: 16),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                onPressed: _resetApp,
-                tooltip: 'Reset App',
-              ),
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: IconButton(
+              icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+              onPressed: _resetApp,
+              tooltip: 'Reset App',
+            ),
+          ),
         ],
       ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: _getCurrentPage(),
+      body: IndexedStack(
+        index: _currentPage,
+        children: [
+          _buildUploadPage(),
+          _buildOptimizationPage(),
+          _buildResultsPage(),
+        ],
       ),
       bottomNavigationBar: _buildBottomNavigation(),
     );
   }
 
-  Widget _getCurrentPage() {
-    switch (_currentPage) {
-      case 0:
-        return Container(key: const ValueKey('upload'), child: _buildUploadPage());
-      case 1:
-        return Container(key: const ValueKey('optimize'), child: _buildOptimizationPage());
-      case 2:
-        return Container(key: const ValueKey('results'), child: _buildResultsPage());
-      default:
-        return Container(key: const ValueKey('upload'), child: _buildUploadPage());
-    }
-  }
 
   Widget _buildUploadPage() {
     return Stack(

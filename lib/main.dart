@@ -18,7 +18,7 @@ class MenuOptimizerApp extends StatelessWidget {
     return MultiProvider(
       providers: DependencyInjection.providers,
       child: MaterialApp(
-        title: 'Menu Optimizer Pro - PennApps 2025',
+        title: 'Menu Max - PennApps 2025',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.blue,

@@ -36,7 +36,7 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
       if (result.success && result.userId != null) {
         // Initialize MongoDB in background after successful auth
         _initializeMongoDBInBackground();
-        _navigateToHome();
+        _navigateToWelcome();
         return;
       }
 
@@ -95,7 +95,7 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
           ),
         );
 
-        _navigateToHome();
+        _navigateToWelcome();
       } else {
         setState(() {
           _error = result.error ?? 'Login failed';
@@ -145,9 +145,9 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
     }
   }
 
-  /// Navigate to home screen
-  void _navigateToHome() {
-    Navigator.of(context).pushReplacementNamed('/home');
+  /// Navigate to welcome screen
+  void _navigateToWelcome() {
+    Navigator.of(context).pushReplacementNamed('/welcome');
   }
 
   @override
@@ -202,7 +202,7 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Menu Optimizer Pro',
+                  'Menu Max',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
