@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home_screen.dart'; // Ensure this import matches your project's structure
 
 class WelcomeScreen extends StatelessWidget {
   @override
@@ -20,7 +21,7 @@ class WelcomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                  MaterialPageRoute(builder: (context) => HomeScreen()), // Ensure HomeScreen is correctly imported
                 );
               },
               child: Text('Go to Home Page'),
