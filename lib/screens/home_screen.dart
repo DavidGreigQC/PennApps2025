@@ -21,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   int _currentPage = 0;
   List<String> _uploadedFilesAndUrls = [];
   OptimizationRequest? _optimizationRequest;
+  List<String> _breadcrumbs = ['Home', 'Upload'];
 
   @override
   bool get wantKeepAlive => true;
@@ -31,14 +32,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(
-          'Menu Max',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-            color: Colors.white,
-          ),
-        ),
+        title: _buildBreadcrumbs(),
         backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: Container(
@@ -89,6 +83,59 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     );
   }
 
+  Widget _buildBreadcrumbs() {
+    return Row(
+      children: [
+        Text(
+          'Menu Max',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            color: Colors.white,
+          ),
+        ),
+        if (_breadcrumbs.length > 1) ...[
+          const SizedBox(width: 8),
+          Text(
+            '•',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              _breadcrumbs.skip(1).join(' • '),
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.9),
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  void _updateBreadcrumbs() {
+    List<String> newBreadcrumbs = ['Home', 'Upload'];
+
+    if (_currentPage >= 1 && _uploadedFilesAndUrls.isNotEmpty) {
+      newBreadcrumbs.add('Optimize');
+    }
+
+    if (_currentPage >= 2 && _optimizationRequest != null) {
+      newBreadcrumbs.add('Results');
+    }
+
+    setState(() {
+      _breadcrumbs = newBreadcrumbs;
+    });
+  }
 
   Widget _buildUploadPage() {
     return Stack(
@@ -165,6 +212,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                   setState(() {
                     _uploadedFilesAndUrls = files;
                   });
+                  _updateBreadcrumbs();
                 },
               ),
             ],
@@ -296,6 +344,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               setState(() {
                 _optimizationRequest = request;
               });
+              _updateBreadcrumbs();
             },
           ),
           const SizedBox(height: 16),
@@ -512,6 +561,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
             setState(() {
               _currentPage = index;
             });
+            _updateBreadcrumbs();
           } : null,
           borderRadius: BorderRadius.circular(16),
           child: Container(
@@ -613,6 +663,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
       _uploadedFilesAndUrls.clear();
       _optimizationRequest = null;
       _currentPage = 0;
+      _breadcrumbs = ['Home', 'Upload'];
     });
 
     final service = Provider.of<MenuOptimizationService>(context, listen: false);
