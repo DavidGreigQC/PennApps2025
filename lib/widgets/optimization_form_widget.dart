@@ -436,15 +436,17 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                     children: [
                       Icon(Icons.tune_rounded, color: Colors.green[600], size: 18),
                       const SizedBox(width: 8),
-                      Text(
-                        'Importance Weight',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green[700],
-                          fontSize: 14,
+                      Flexible(
+                        child: Text(
+                          'Importance Weight',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.green[700],
+                            fontSize: 14,
+                          ),
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
@@ -553,34 +555,38 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                       selectedColor: Colors.white,
                       fillColor: Colors.orange[500],
                       color: Colors.orange[600],
-                      constraints: const BoxConstraints(minHeight: 44, minWidth: 100),
+                      constraints: const BoxConstraints(minHeight: 44),
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.trending_up_rounded, size: 16),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Maximize',
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                            ],
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.trending_up_rounded, size: 16),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Maximize',
+                                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.trending_down_rounded, size: 16),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Minimize',
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                            ],
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.trending_down_rounded, size: 16),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Minimize',
+                                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
