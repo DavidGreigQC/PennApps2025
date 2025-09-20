@@ -544,48 +544,87 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.orange[200]!, width: 1),
                     ),
-                    child: ToggleButtons(
-                      isSelected: [criteria.isMaximize, !criteria.isMaximize],
-                      onPressed: (index) {
-                        setState(() {
-                          criteria.isMaximize = index == 0;
-                        });
-                      },
-                      borderRadius: BorderRadius.circular(8),
-                      selectedColor: Colors.white,
-                      fillColor: Colors.orange[500],
-                      color: Colors.orange[600],
-                      constraints: const BoxConstraints(minHeight: 44),
+                    child: Row(
                       children: [
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.trending_up_rounded, size: 16),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Maximize',
-                                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                criteria.isMaximize = true;
+                              });
+                            },
+                            child: Container(
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: criteria.isMaximize ? Colors.orange[500] : Colors.white,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  bottomLeft: Radius.circular(8),
                                 ),
-                              ],
+                                border: Border.all(color: Colors.orange[300]!, width: 1),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.trending_up_rounded,
+                                    size: 16,
+                                    color: criteria.isMaximize ? Colors.white : Colors.orange[600],
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      'Max',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                        color: criteria.isMaximize ? Colors.white : Colors.orange[600],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.trending_down_rounded, size: 16),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Minimize',
-                                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                criteria.isMaximize = false;
+                              });
+                            },
+                            child: Container(
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: !criteria.isMaximize ? Colors.orange[500] : Colors.white,
+                                borderRadius: const BorderRadius.only(
+                                  topRight: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
                                 ),
-                              ],
+                                border: Border.all(color: Colors.orange[300]!, width: 1),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.trending_down_rounded,
+                                    size: 16,
+                                    color: !criteria.isMaximize ? Colors.white : Colors.orange[600],
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      'Min',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                        color: !criteria.isMaximize ? Colors.white : Colors.orange[600],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
