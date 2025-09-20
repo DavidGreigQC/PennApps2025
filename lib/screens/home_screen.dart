@@ -65,43 +65,90 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildUploadPage() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.restaurant_menu, size: 48, color: Theme.of(context).primaryColor),
-                  const SizedBox(height: 16),
-                  Text('Upload Menu Files', style: Theme.of(context).textTheme.headlineSmall),
-                  const SizedBox(height: 8),
-                  Text('Upload PDFs, images, or enter a menu URL to get started.',
-                      style: Theme.of(context).textTheme.bodyMedium),
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 100.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.restaurant_menu, size: 48, color: Theme.of(context).primaryColor),
+                      const SizedBox(height: 16),
+                      Text('Upload Menu Files', style: Theme.of(context).textTheme.headlineSmall),
+                      const SizedBox(height: 8),
+                      Text('Upload PDFs, images, or enter a menu URL to get started.',
+                          style: Theme.of(context).textTheme.bodyMedium),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              FileUploadWidget(
+                onFilesSelected: (files) {
+                  setState(() {
+                    _uploadedFilesAndUrls = files;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        if (_uploadedFilesAndUrls.isNotEmpty)
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue[600]!, Colors.blue[700]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blue.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
+              ),
+              child: ElevatedButton(
+                onPressed: _goToOptimizationPage,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.arrow_forward_rounded, size: 20),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Continue to Optimization',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          FileUploadWidget(
-            onFilesSelected: (files) {
-              setState(() {
-                _uploadedFilesAndUrls = files;
-              });
-            },
-          ),
-          const SizedBox(height: 16),
-          if (_uploadedFilesAndUrls.isNotEmpty)
-            ElevatedButton(
-              onPressed: _goToOptimizationPage,
-              child: const Text('Continue to Optimization'),
-            ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -137,9 +184,48 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 16),
           if (_optimizationRequest != null)
-            ElevatedButton(
-              onPressed: _startOptimization,
-              child: const Text('Start Optimization'),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.green[600]!, Colors.green[700]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton(
+                onPressed: _startOptimization,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.play_arrow_rounded, size: 20),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Start Optimization',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
         ],
       ),

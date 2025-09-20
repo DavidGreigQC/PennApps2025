@@ -199,46 +199,51 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                       children: [
                         Icon(Icons.check_circle_rounded, color: Colors.green[600], size: 18),
                         const SizedBox(width: 8),
-                        Text(
-                          'Selected Files (${_selectedFilesAndUrls.length})',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.green[700],
-                            fontSize: 14,
-                          ),
-                        ),
-                        const Spacer(),
-                        Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: _clearAll,
-                            borderRadius: BorderRadius.circular(6),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.red[50],
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: Colors.red[200]!, width: 1),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.clear_rounded, color: Colors.red[600], size: 14),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'Clear All',
-                                    style: TextStyle(
-                                      color: Colors.red[600],
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                        Expanded(
+                          child: Text(
+                            'Selected Files (${_selectedFilesAndUrls.length})',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.green[700],
+                              fontSize: 14,
                             ),
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _clearAll,
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.red[50],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.red[200]!, width: 1),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.clear_rounded, color: Colors.red[600], size: 16),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Clear All',
+                                  style: TextStyle(
+                                    color: Colors.red[600],
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 12),
                     ..._selectedFilesAndUrls.map((item) => _buildFileOrUrlItem(item)),
