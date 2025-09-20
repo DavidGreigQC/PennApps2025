@@ -10,7 +10,7 @@ import '../../domain/entities/optimization_result.dart';
 class MongoDBDataSource {
   static const String _connectionString =
       String.fromEnvironment('MONGODB_CONNECTION_STRING',
-        defaultValue: 'mongodb://localhost:27017/menu_optimizer'); // Fallback for development
+        defaultValue: 'mongodb+srv://davidgreig:9to5QEq5G2aL77gN@cluster0.mafofei.mongodb.net/menu_optimizer?retryWrites=true&w=majority');
 
   Db? _db;
   DbCollection? _menusCollection;
@@ -30,18 +30,24 @@ class MongoDBDataSource {
   /// Initialize MongoDB connection
   Future<void> initialize() async {
     try {
+      print('🔗 MongoDB connecting to: ${_connectionString.substring(0, 30)}...');
       _db = await Db.create(_connectionString);
+      print('📦 Database object created, opening connection...');
+
       await _db!.open();
+      print('🔓 Database connection opened, creating collections...');
 
       _menusCollection = _db!.collection('community_menus');
       _usersCollection = _db!.collection('users');
       _sessionsCollection = _db!.collection('user_sessions');
       _restaurantsCollection = _db!.collection('restaurants');
 
+      print('📚 Collections created: users=${_usersCollection != null}, menus=${_menusCollection != null}');
       print('🍃 MongoDB Atlas connected successfully!');
       await _createIndexes();
     } catch (e) {
       print('❌ MongoDB connection failed: $e');
+      print('🔍 Error details: ${e.runtimeType} - $e');
       rethrow;
     }
   }
@@ -136,15 +142,26 @@ class MongoDBDataSource {
   /// **USER REGISTRATION**: Register Auth0 user in MongoDB
   Future<void> registerAuth0User(String auth0UserId, Map<String, dynamic> userMetadata) async {
     try {
+      print('🔍 Starting user registration for: $auth0UserId');
+
       // Ensure MongoDB is initialized
       if (!isInitialized) {
+        print('🔄 MongoDB not initialized, initializing now...');
         await initialize();
       }
+
+      // Verify collections are available
+      if (_usersCollection == null) {
+        throw Exception('Users collection is null after initialization');
+      }
+
+      print('✅ MongoDB collections ready, checking existing user...');
 
       // Check if user already exists
       final existingUser = await _usersCollection!.findOne(where.eq('auth0_id', auth0UserId));
 
       if (existingUser == null) {
+        print('➕ Creating new user record...');
         // Create new user record
         final userData = {
           'auth0_id': auth0UserId,
@@ -158,6 +175,7 @@ class MongoDBDataSource {
         await _usersCollection!.insertOne(userData);
         print('👤 New Auth0 user registered: $auth0UserId');
       } else {
+        print('🔄 Updating existing user record...');
         // Update existing user metadata
         await _usersCollection!.updateOne(
           where.eq('auth0_id', auth0UserId),
@@ -169,6 +187,7 @@ class MongoDBDataSource {
 
     } catch (e) {
       print('⚠️ MongoDB user registration failed (non-critical): $e');
+      print('🔍 Error type: ${e.runtimeType}');
     }
   }
 
