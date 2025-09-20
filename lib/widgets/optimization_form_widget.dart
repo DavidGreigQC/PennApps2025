@@ -326,7 +326,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Row with Dropdown and Delete Button
+            // Header Row with Icon and Delete Button
             Row(
               children: [
                 Container(
@@ -343,41 +343,15 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[200]!, width: 1),
-                    ),
-                    child: DropdownButtonFormField<CriteriaOption>(
-                      initialValue: criteria.option,
-                      decoration: const InputDecoration(
-                        labelText: 'Optimization Goal',
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      ),
-                      isExpanded: true,
-                      items: _availableCriteria.map((option) {
-                        return DropdownMenuItem(
-                          value: option,
-                          child: Text(
-                            option.displayName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          criteria.option = value!;
-                        });
-                      },
+                  child: Text(
+                    'Optimization Goal',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                      fontSize: 16,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -398,6 +372,42 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+
+            // Dropdown on separate line
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!, width: 1),
+              ),
+              child: DropdownButtonFormField<CriteriaOption>(
+                initialValue: criteria.option,
+                decoration: const InputDecoration(
+                  labelText: 'Select Goal',
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                isExpanded: true,
+                items: _availableCriteria.map((option) {
+                  return DropdownMenuItem(
+                    value: option,
+                    child: Text(
+                      option.displayName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    criteria.option = value!;
+                  });
+                },
+              ),
             ),
             const SizedBox(height: 16),
 
