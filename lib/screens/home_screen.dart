@@ -36,13 +36,14 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
         title: Center(
           child: Image.asset(
             'assets/images/menumaxlogo.png',
-            height: 40,
+            height: 80,
             fit: BoxFit.contain,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        toolbarHeight: 100,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(

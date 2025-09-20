@@ -197,11 +197,33 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // App Title
-                Icon(
-                  Icons.restaurant_menu,
-                  size: 80,
-                  color: Colors.white,
+                // App Logo with translucent pill border
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(60),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                      BoxShadow(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        blurRadius: 30,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Image.asset(
+                    'assets/images/menumaxlogo.png',
+                    height: 120,
+                    fit: BoxFit.contain,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Text(
@@ -331,73 +353,74 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
 
                 // Community Stats (if available)
                 if (_communityStats != null) ...[
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  Text(
+                    '🌟 Community Stats',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 18,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            '🌟 Community Stats',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue[800],
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _StatItem(
-                                'Menus',
-                                '${_communityStats!['total_menus'] ?? 0}',
-                              ),
-                              _StatItem(
-                                'Users',
-                                '${_communityStats!['total_users'] ?? 0}',
-                              ),
-                              _StatItem(
-                                'Optimizations',
-                                '${_communityStats!['total_optimizations'] ?? 0}',
-                              ),
-                            ],
-                          ),
-                        ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _StatCard(
+                        'Menus',
+                        '${_communityStats!['total_menus'] ?? 0}',
+                        Colors.blue[600]!,
                       ),
-                    ),
+                      _StatCard(
+                        'Users',
+                        '${_communityStats!['total_users'] ?? 0}',
+                        Colors.green[600]!,
+                      ),
+                      _StatCard(
+                        'Optimizations',
+                        '${_communityStats!['total_optimizations'] ?? 0}',
+                        Colors.purple[600]!,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                 ],
 
-                // Features List
+                // Enterprise Features as Individual Cards
                 Text(
-                  'Prize Features:',
+                  '🚀 Enterprise Features',
                   style: TextStyle(
-                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
+                    fontSize: 18,
                   ),
                 ),
                 const SizedBox(height: 16),
-                _FeatureItem(
-                  icon: Icons.security,
-                  text: 'Auth0 Enterprise Security',
-                ),
-                _FeatureItem(
-                  icon: Icons.cloud_sync,
-                  text: 'MongoDB Data Storage',
-                ),
-                _FeatureItem(
-                  icon: Icons.camera_alt,
-                  text: 'Gemini Vision OCR',
-                ),
-                _FeatureItem(
-                  icon: Icons.analytics,
-                  text: 'Real-time Analytics',
+                Column(
+                  children: [
+                    _FeatureCard(
+                      icon: Icons.security,
+                      text: 'Auth0 Enterprise Security',
+                      color: Colors.orange[600]!,
+                    ),
+                    const SizedBox(height: 12),
+                    _FeatureCard(
+                      icon: Icons.cloud_sync,
+                      text: 'MongoDB Data Storage',
+                      color: Colors.indigo[600]!,
+                    ),
+                    const SizedBox(height: 12),
+                    _FeatureCard(
+                      icon: Icons.camera_alt,
+                      text: 'Gemini Vision OCR',
+                      color: Colors.teal[600]!,
+                    ),
+                    const SizedBox(height: 12),
+                    _FeatureCard(
+                      icon: Icons.analytics,
+                      text: 'Real-time Analytics',
+                      color: Colors.red[600]!,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -408,65 +431,91 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
   }
 }
 
-class _StatItem extends StatelessWidget {
+class _StatCard extends StatelessWidget {
   final String label;
   final String value;
+  final Color color;
 
-  const _StatItem(this.label, this.value);
+  const _StatCard(this.label, this.value, this.color);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue[800],
+    return Expanded(
+      child: Card(
+        elevation: 6,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        color: color,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white70,
+                ),
+              ),
+            ],
           ),
         ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
-class _FeatureItem extends StatelessWidget {
+class _FeatureCard extends StatelessWidget {
   final IconData icon;
   final String text;
+  final Color color;
 
-  const _FeatureItem({
+  const _FeatureCard({
     required this.icon,
     required this.text,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: Colors.white70,
-            size: 20,
-          ),
-          const SizedBox(width: 12),
-          Text(
-            text,
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: color,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.white,
+              size: 24,
             ),
-          ),
-        ],
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
