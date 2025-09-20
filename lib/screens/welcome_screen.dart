@@ -438,57 +438,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-
-            // Quick Actions
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue[600]!, Colors.blue[700]!],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blue.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  foregroundColor: Colors.white,
-                  shadowColor: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.add_rounded, size: 20),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Start New Optimization',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
       ),
