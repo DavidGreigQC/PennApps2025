@@ -27,19 +27,50 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Menu Optimizer'),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        title: Text(
+          'Menu Optimizer',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blue[600]!, Colors.blue[800]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.bug_report),
-            onPressed: () => Navigator.pushNamed(context, '/test-caching'),
-            tooltip: 'Test Data Caching',
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.bug_report_rounded, color: Colors.white),
+              onPressed: () => Navigator.pushNamed(context, '/test-caching'),
+              tooltip: 'Test Data Caching',
+            ),
           ),
           if (_currentPage > 0)
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: _resetApp,
+            Container(
+              margin: const EdgeInsets.only(right: 16),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                onPressed: _resetApp,
+                tooltip: 'Reset App',
+              ),
             ),
         ],
       ),
@@ -434,22 +465,95 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBottomNavigation() {
     return Consumer<MenuOptimizationService>(
       builder: (context, service, child) {
-        return BottomNavigationBar(
-          currentIndex: _currentPage,
-          onTap: (index) {
-            if (_canNavigateToPage(index, service)) {
-              setState(() {
-                _currentPage = index;
-              });
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.upload_file), label: 'Upload'),
-            BottomNavigationBarItem(icon: Icon(Icons.tune), label: 'Optimize'),
-            BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Results'),
-          ],
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Container(
+              height: 65,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildNavItem(0, Icons.upload_file_rounded, 'Upload', service),
+                  _buildNavItem(1, Icons.tune_rounded, 'Optimize', service),
+                  _buildNavItem(2, Icons.analytics_rounded, 'Results', service),
+                ],
+              ),
+            ),
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String label, MenuOptimizationService service) {
+    bool isSelected = _currentPage == index;
+    bool canNavigate = _canNavigateToPage(index, service);
+
+    Color backgroundColor = isSelected
+        ? (index == 0 ? Colors.blue[600]! : index == 1 ? Colors.green[600]! : Colors.purple[600]!)
+        : Colors.transparent;
+    Color iconColor = isSelected
+        ? Colors.white
+        : canNavigate ? Colors.grey[600]! : Colors.grey[400]!;
+    Color textColor = isSelected
+        ? Colors.white
+        : canNavigate ? Colors.grey[700]! : Colors.grey[400]!;
+
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: canNavigate ? () {
+            setState(() {
+              _currentPage = index;
+            });
+          } : null,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            height: 50,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: isSelected ? [
+                BoxShadow(
+                  color: backgroundColor.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ] : null,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: iconColor,
+                  size: 22,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
