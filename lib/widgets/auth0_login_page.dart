@@ -124,8 +124,11 @@ class _Auth0LoginPageState extends State<Auth0LoginPage> {
       }
 
       await mongoDataSource.registerAuth0User(auth0UserId, metadata);
+      print('✅ User registered in MongoDB successfully');
     } catch (e) {
-      print('Error registering user in MongoDB: $e');
+      // MongoDB registration failure doesn't break login - just log it
+      print('⚠️ MongoDB registration failed (non-critical): $e');
+      print('💡 User can still use the app, but community features may be limited');
     }
   }
 

@@ -84,7 +84,7 @@ class Auth0DataSource {
         _credentials = credentials;
         _user = credentials.user; // User profile is included in stored credentials
 
-        print('✅ Auth0 session restored: ${_user?.name}');
+        print('✅ Auth0 session restored: ${_user?.name ?? 'Unknown User'}');
 
         return AuthResult(
           success: true,
@@ -94,9 +94,14 @@ class Auth0DataSource {
         );
       }
 
+      // No stored session found - this is normal on first launch
       return AuthResult(success: false, error: 'No valid stored session');
 
     } catch (e) {
+      // Only log actual errors, not normal "no session" cases
+      if (e.toString().contains('Null') || e.toString().contains('type cast')) {
+        return AuthResult(success: false, error: 'No valid stored session');
+      }
       print('❌ Auth0 session restore error: $e');
       return AuthResult(success: false, error: e.toString());
     }

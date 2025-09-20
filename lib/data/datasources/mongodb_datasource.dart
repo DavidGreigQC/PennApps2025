@@ -136,6 +136,11 @@ class MongoDBDataSource {
   /// **USER REGISTRATION**: Register Auth0 user in MongoDB
   Future<void> registerAuth0User(String auth0UserId, Map<String, dynamic> userMetadata) async {
     try {
+      // Ensure MongoDB is initialized
+      if (!isInitialized) {
+        await initialize();
+      }
+
       // Check if user already exists
       final existingUser = await _usersCollection!.findOne(where.eq('auth0_id', auth0UserId));
 
@@ -163,7 +168,7 @@ class MongoDBDataSource {
       }
 
     } catch (e) {
-      print('❌ User registration error: $e');
+      print('⚠️ MongoDB user registration failed (non-critical): $e');
     }
   }
 
