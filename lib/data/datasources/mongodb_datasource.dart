@@ -11,7 +11,7 @@ import '../../domain/entities/optimization_result.dart';
 class MongoDBDataSource {
   static const String _connectionString =
       String.fromEnvironment('MONGODB_CONNECTION_STRING',
-        defaultValue: 'mongodb+srv://davidgreig:9to5QEq5G2aL77gN@cluster0.mafofei.mongodb.net/menu_optimizer?retryWrites=true&w=majority&authMechanism=SCRAM-SHA-1&tls=true&tlsAllowInvalidCertificates=false&connectTimeoutMS=5000&serverSelectionTimeoutMS=5000&socketTimeoutMS=0');
+        defaultValue: 'mongodb://localhost:27017/menu_optimizer');
 
   Db? _db;
   DbCollection? _menusCollection;

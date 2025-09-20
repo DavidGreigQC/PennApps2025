@@ -4,10 +4,7 @@
         {
             "name": "Launch Flutter App",
             "request": "launch",
-            "type": "dart",
-            "args": [
-                "--dart-define=MONGODB_CONNECTION_STRING=mongodb+srv://davidgreig:9to5QEq5G2aL77gN@cluster0.mafofei.mongodb.net/menu_optimizer?retryWrites=true&w=majority"
-            ]
+            "type": "dart"
         }
     ]
 }
