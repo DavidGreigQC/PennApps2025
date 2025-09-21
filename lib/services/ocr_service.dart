@@ -1,11 +1,38 @@
 import 'dart:io';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import '../models/menu_item.dart';
 import 'syncfusion_pdf_service.dart';
 
 class OCRService {
   final TextRecognizer _textRecognizer = GoogleMlKit.vision.textRecognizer();
   final SyncfusionPDFService _pdfService = SyncfusionPDFService();
+
+  // Gemini AI for intelligent text interpretation
+  static const String _geminiApiKey = String.fromEnvironment('GEMINI_API_KEY');
+  GenerativeModel? _geminiModel;
+
+  OCRService() {
+    _initializeGemini();
+  }
+
+  void _initializeGemini() {
+    try {
+      if (_geminiApiKey.isNotEmpty) {
+        _geminiModel = GenerativeModel(
+          model: 'gemini-1.5-flash',
+          apiKey: _geminiApiKey,
+        );
+        debugPrint('✅ Gemini AI initialized for OCR text interpretation');
+      } else {
+        debugPrint('⚠️ GEMINI_API_KEY not found in environment variables');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Gemini AI initialization failed: $e');
+    }
+  }
 
   Future<List<MenuItem>> extractMenuItems(String filePath) async {
     try {
@@ -51,7 +78,7 @@ class OCRService {
         print(recognizedText.text);
         print('=' * 50);
 
-        extractedItems = _parseMenuText(recognizedText.text);
+        extractedItems = await _parseMenuText(recognizedText.text);
 
         // If OCR extracted no items, return empty list
         if (extractedItems.isEmpty) {
@@ -71,11 +98,94 @@ class OCRService {
     }
   }
 
-  List<MenuItem> _parseMenuText(String text) {
+  Future<List<MenuItem>> _parseMenuText(String text) async {
+    debugPrint('🔍 PARSING OCR text with AI interpretation...');
+
+    // First try AI-powered interpretation
+    List<MenuItem> aiParsedItems = await _parseWithAI(text);
+
+    if (aiParsedItems.isNotEmpty) {
+      debugPrint('✅ AI successfully parsed ${aiParsedItems.length} items');
+      return aiParsedItems;
+    }
+
+    // Fallback to traditional parsing
+    debugPrint('⚠️ Falling back to traditional OCR parsing');
+    return _parseTraditionally(text);
+  }
+
+  /// Use AI to intelligently interpret OCR text and extract menu items
+  Future<List<MenuItem>> _parseWithAI(String text) async {
+    if (_geminiModel == null) return [];
+
+    try {
+      String prompt = '''You are analyzing OCR text from a restaurant menu. The text may be garbled, have OCR errors, or be poorly formatted.
+
+Extract clean menu items with prices from this text:
+"$text"
+
+Rules:
+1. Each item should have a logical food name and price
+2. Ignore instruction text, headers, or non-food items
+3. Clean up OCR errors (like "Qtyfrench" → ignore, "Instructionsmal" → ignore)
+4. Combine fragments into coherent food names (like "French Fries")
+5. Price should be reasonable (\$1-50)
+6. Be intelligent about interpreting garbled text
+7. For "Mcnuggets" write as "McNuggets"
+
+Respond with ONLY a JSON array like:
+[
+  {"name": "French Fries", "price": 2.99, "description": null},
+  {"name": "Chicken McNuggets", "price": 5.99, "description": null}
+]
+
+If no valid menu items found, return: []''';
+
+      final response = await _geminiModel!.generateContent([Content.text(prompt)])
+          .timeout(const Duration(seconds: 10));
+
+      final responseText = response.text?.trim();
+      if (responseText != null) {
+        // Extract JSON from response
+        final jsonMatch = RegExp(r'\[.*\]', dotAll: true).firstMatch(responseText);
+        if (jsonMatch != null) {
+          final jsonText = jsonMatch.group(0)!;
+          final List<dynamic> jsonData = jsonDecode(jsonText);
+
+          List<MenuItem> items = [];
+          for (var itemData in jsonData) {
+            if (itemData is Map<String, dynamic>) {
+              final name = itemData['name']?.toString();
+              final price = itemData['price'];
+              final description = itemData['description']?.toString();
+
+              if (name != null && name.isNotEmpty && price is num && price > 0) {
+                items.add(MenuItem(
+                  name: name,
+                  price: price.toDouble(),
+                  description: description,
+                ));
+                debugPrint('🤖 AI EXTRACTED: $name - \$${price.toStringAsFixed(2)}');
+              }
+            }
+          }
+
+          return items;
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ AI parsing failed: $e');
+    }
+
+    return [];
+  }
+
+  /// Traditional fallback parsing method
+  List<MenuItem> _parseTraditionally(String text) {
     List<MenuItem> items = [];
     List<String> lines = text.split('\n');
 
-    print('PARSING ${lines.length} lines of text...');
+    debugPrint('📝 PARSING ${lines.length} lines with traditional method...');
 
     for (int i = 0; i < lines.length; i++) {
       String line = lines[i].trim();
@@ -99,7 +209,7 @@ class OCRService {
           );
 
           items.add(item);
-          print('EXTRACTED: ${item.name} - \$${item.price}');
+          debugPrint('📋 EXTRACTED: ${item.name} - \$${item.price}');
         }
       }
     }
@@ -124,7 +234,7 @@ class OCRService {
             );
 
             items.add(item);
-            print('EXTRACTED (2nd pass): ${item.name} - \$${item.price}');
+            debugPrint('📋 EXTRACTED (2nd pass): ${item.name} - \$${item.price}');
           }
         }
       }
@@ -147,14 +257,14 @@ class OCRService {
 
           if (!_isDuplicateByName(items, item.name)) {
             items.add(item);
-            print('EXTRACTED (smart parsing): ${item.name}');
+            debugPrint('📋 EXTRACTED (smart parsing): ${item.name}');
           }
         }
       }
     }
 
     List<MenuItem> deduplicated = _deduplicate(items);
-    print('FINAL: ${deduplicated.length} unique menu items extracted');
+    debugPrint('✅ FINAL: ${deduplicated.length} unique menu items extracted');
     return deduplicated;
   }
 

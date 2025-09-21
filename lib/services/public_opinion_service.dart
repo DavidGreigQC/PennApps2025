@@ -6,8 +6,7 @@ import '../models/menu_item.dart';
 
 /// Service for gathering and analyzing public opinion data about menu items
 class PublicOpinionService {
-  static const String _geminiApiKey = String.fromEnvironment('GEMINI_API_KEY',
-      defaultValue: 'AIzaSyB74fO9BXo1pdzLYD7gjM8SoPwJX0XDpok');
+  static const String _geminiApiKey = String.fromEnvironment('GEMINI_API_KEY');
 
   static PublicOpinionService? _instance;
   GenerativeModel? _geminiModel;
@@ -23,11 +22,15 @@ class PublicOpinionService {
 
   void _initializeGemini() {
     try {
-      _geminiModel = GenerativeModel(
-        model: 'gemini-1.5-flash',
-        apiKey: _geminiApiKey,
-      );
-      debugPrint('✅ Gemini AI initialized for public opinion analysis');
+      if (_geminiApiKey.isNotEmpty) {
+        _geminiModel = GenerativeModel(
+          model: 'gemini-1.5-flash',
+          apiKey: _geminiApiKey,
+        );
+        debugPrint('✅ Gemini AI initialized for public opinion analysis');
+      } else {
+        debugPrint('⚠️ GEMINI_API_KEY not found in environment variables');
+      }
     } catch (e) {
       debugPrint('⚠️ Gemini AI initialization failed: $e');
     }
