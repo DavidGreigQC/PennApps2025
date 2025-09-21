@@ -168,7 +168,7 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
           ),
         ),
         title: Text(
-          result.menuItem.name,
+          _standardizeMenuItemName(result.menuItem.name),
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 16,
@@ -1000,6 +1000,21 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
     }
 
     return '\$${estimatedPrice.toStringAsFixed(2)}';
+  }
+
+  /// Standardize menu item name by removing numbers/special characters and proper capitalization
+  String _standardizeMenuItemName(String name) {
+    // Remove numbers and special characters, keep only letters and spaces
+    String cleaned = name.replaceAll(RegExp(r'[^a-zA-Z\s]'), ' ');
+
+    // Split into words and process each
+    List<String> words = cleaned.split(RegExp(r'\s+'))
+        .where((word) => word.isNotEmpty)
+        .map((word) => word.toLowerCase())
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .toList();
+
+    return words.join(' ');
   }
 
   @override

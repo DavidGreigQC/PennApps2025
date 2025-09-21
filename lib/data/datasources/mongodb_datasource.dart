@@ -30,8 +30,9 @@ class MongoDBDataSource {
 
   /// Initialize MongoDB connection (DISABLED FOR NOW - USING LOCAL STORAGE ONLY)
   Future<void> initialize() async {
-    print('⚠️ MongoDB Atlas: Skipped (known timeout issue)');
-    print('📱 Using local storage fallback for all operations');
+    // Silently skip MongoDB Atlas connection
+    // print('⚠️ MongoDB Atlas: Skipped (known timeout issue)');
+    // print('📱 Using local storage fallback for all operations');
 
     // Skip MongoDB initialization entirely
     // All operations will automatically fall back to SharedPreferences
@@ -62,9 +63,9 @@ class MongoDBDataSource {
         'location': '2dsphere',
       });
 
-      print('🔍 Database indexes created successfully!');
+      // print('🔍 Database indexes created successfully!');
     } catch (e) {
-      print('⚠️ Index creation warning: $e');
+      // print('⚠️ Index creation warning: $e');
     }
   }
 
@@ -72,7 +73,7 @@ class MongoDBDataSource {
   /// This is the key feature - users benefit from previous users' work!
   Future<List<MenuItem>?> getCommunityMenuData(String restaurantIdentifier) async {
     try {
-      print('🔍 Searching community database for: $restaurantIdentifier');
+      // print('🔍 Searching community database for: $restaurantIdentifier');
 
       // Try MongoDB Atlas first
       if (isInitialized && _menusCollection != null) {
@@ -88,17 +89,17 @@ class MongoDBDataSource {
             modify.set('last_accessed', DateTime.now()),
           );
 
-          print('✅ Found ${items.length} items in MongoDB Atlas!');
+          // print('✅ Found ${items.length} items in MongoDB Atlas!');
           return items;
         }
       }
 
       // Fallback to local storage
-      print('🔍 Checking local storage for: $restaurantIdentifier');
+      // print('🔍 Checking local storage for: $restaurantIdentifier');
       return await _getCommunityMenuDataLocally(restaurantIdentifier);
 
     } catch (e) {
-      print('❌ Error querying community database, checking local storage: $e');
+      // print('❌ Error querying community database, checking local storage: $e');
       return await _getCommunityMenuDataLocally(restaurantIdentifier);
     }
   }
@@ -114,14 +115,14 @@ class MongoDBDataSource {
         final List<dynamic> itemsData = menuData['menu_items'] ?? [];
         final items = itemsData.map((data) => MenuItem.fromJson(data)).toList();
 
-        print('✅ Found ${items.length} items in local storage!');
+        // print('✅ Found ${items.length} items in local storage!');
         return items;
       }
 
-      print('📭 No data found in community database or local storage');
+      // print('📭 No data found in community database or local storage');
       return null;
     } catch (e) {
-      print('❌ Error querying local storage: $e');
+      // print('❌ Error querying local storage: $e');
       return null;
     }
   }
@@ -136,7 +137,8 @@ class MongoDBDataSource {
     try {
       // Try MongoDB Atlas first, fallback to local storage
       if (!isInitialized || _menusCollection == null) {
-        print('⚠️ MongoDB collections unavailable, using local storage for menu contribution');
+        // Silently use local storage fallback
+        // print('⚠️ MongoDB collections unavailable, using local storage for menu contribution');
         await _contributeCommunityMenuDataLocally(restaurantIdentifier, items, userId);
         return;
       }
@@ -154,13 +156,13 @@ class MongoDBDataSource {
       };
 
       await _menusCollection!.insertOne(restaurantData);
-      print('🌟 Contributed ${items.length} items to community database!');
+      // print('🌟 Contributed ${items.length} items to community database!');
 
       // Update restaurant metadata
       await _updateRestaurantMetadata(restaurantIdentifier, items.length);
 
     } catch (e) {
-      print('❌ Error contributing to community database, falling back to local storage: $e');
+      // print('❌ Error contributing to community database, falling back to local storage: $e');
       await _contributeCommunityMenuDataLocally(restaurantIdentifier, items, userId);
     }
   }
@@ -183,24 +185,24 @@ class MongoDBDataSource {
       };
 
       await prefs.setString('menu_data_$restaurantIdentifier', jsonEncode(restaurantData));
-      print('🌟 Contributed ${items.length} items to local storage!');
+      // print('🌟 Contributed ${items.length} items to local storage!');
     } catch (e) {
-      print('❌ Local menu contribution failed: $e');
+      // print('❌ Local menu contribution failed: $e');
     }
   }
 
   /// **USER REGISTRATION**: Register Auth0 user (fallback to local storage)
   Future<void> registerAuth0User(String auth0UserId, Map<String, dynamic> userMetadata) async {
     try {
-      print('🔍 Starting user registration for: $auth0UserId');
+      // print('🔍 Starting user registration for: $auth0UserId');
 
       // Try MongoDB Atlas first, fallback to local storage
       if (!isInitialized) {
         try {
-          print('🔄 Attempting MongoDB connection...');
+          // print('🔄 Attempting MongoDB connection...');
           await initialize();
         } catch (e) {
-          print('⚠️ MongoDB Atlas unavailable, using local storage fallback');
+          // print('⚠️ MongoDB Atlas unavailable, using local storage fallback');
           await _registerUserLocally(auth0UserId, userMetadata);
           return;
         }
@@ -208,18 +210,18 @@ class MongoDBDataSource {
 
       // Verify collections are available
       if (_usersCollection == null) {
-        print('⚠️ MongoDB collections unavailable, using local storage fallback');
+        // print('⚠️ MongoDB collections unavailable, using local storage fallback');
         await _registerUserLocally(auth0UserId, userMetadata);
         return;
       }
 
-      print('✅ MongoDB collections ready, checking existing user...');
+      // print('✅ MongoDB collections ready, checking existing user...');
 
       // Check if user already exists
       final existingUser = await _usersCollection!.findOne(where.eq('auth0_id', auth0UserId));
 
       if (existingUser == null) {
-        print('➕ Creating new user record...');
+        // print('➕ Creating new user record...');
         // Create new user record
         final userData = {
           'auth0_id': auth0UserId,
@@ -231,20 +233,20 @@ class MongoDBDataSource {
         };
 
         await _usersCollection!.insertOne(userData);
-        print('👤 New Auth0 user registered in MongoDB Atlas: $auth0UserId');
+        // print('👤 New Auth0 user registered in MongoDB Atlas: $auth0UserId');
       } else {
-        print('🔄 Updating existing user record...');
+        // print('🔄 Updating existing user record...');
         // Update existing user metadata
         await _usersCollection!.updateOne(
           where.eq('auth0_id', auth0UserId),
           modify.set('user_metadata', userMetadata)
               .set('last_active', DateTime.now()),
         );
-        print('👤 Auth0 user updated in MongoDB Atlas: $auth0UserId');
+        // print('👤 Auth0 user updated in MongoDB Atlas: $auth0UserId');
       }
 
     } catch (e) {
-      print('⚠️ MongoDB Atlas failed, using local storage fallback: $e');
+      // print('⚠️ MongoDB Atlas failed, using local storage fallback: $e');
       await _registerUserLocally(auth0UserId, userMetadata);
     }
   }
@@ -264,9 +266,9 @@ class MongoDBDataSource {
       };
 
       await prefs.setString('user_data_$auth0UserId', jsonEncode(userData));
-      print('👤 Auth0 user registered locally: $auth0UserId');
+      // print('👤 Auth0 user registered locally: $auth0UserId');
     } catch (e) {
-      print('❌ Local user registration failed: $e');
+      // print('❌ Local user registration failed: $e');
     }
   }
 
@@ -290,9 +292,9 @@ class MongoDBDataSource {
         modify.inc('optimization_count', 1),
       );
 
-      print('💾 User session saved to MongoDB Atlas');
+      // print('💾 User session saved to MongoDB Atlas');
     } catch (e) {
-      print('❌ Error saving user session: $e');
+      // print('❌ Error saving user session: $e');
     }
   }
 
@@ -325,7 +327,7 @@ class MongoDBDataSource {
         'generated_at': DateTime.now(),
       };
     } catch (e) {
-      print('❌ Error getting community insights: $e');
+      // print('❌ Error getting community insights: $e');
       return {};
     }
   }
@@ -347,7 +349,7 @@ class MongoDBDataSource {
         upsert: true,
       );
     } catch (e) {
-      print('⚠️ Restaurant metadata update warning: $e');
+      // print('⚠️ Restaurant metadata update warning: $e');
     }
   }
 
@@ -363,11 +365,11 @@ class MongoDBDataSource {
     };
 
     try {
-      print('🧪 Starting LOCAL STORAGE data caching test for restaurant: $testRestaurantId');
-      print('⚠️ Skipping MongoDB Atlas tests (known timeout issue)');
+      // print('🧪 Starting LOCAL STORAGE data caching test for restaurant: $testRestaurantId');
+      // print('⚠️ Skipping MongoDB Atlas tests (known timeout issue)');
 
       // Test 1: Check if data exists in local storage before contribution
-      print('🔍 Test 1: Checking local storage for existing menu data...');
+      // print('🔍 Test 1: Checking local storage for existing menu data...');
       final existingData = await _getCommunityMenuDataLocally(testRestaurantId);
       results['tests']['pre_contribution_check'] = {
         'exists': existingData != null,
@@ -375,10 +377,10 @@ class MongoDBDataSource {
         'storage_type': 'local',
         'status': 'completed'
       };
-      print('✅ Pre-contribution check: ${existingData != null ? 'Found ${existingData!.length} items in local storage' : 'No existing local data'}');
+      // print('✅ Pre-contribution check: ${existingData != null ? 'Found ${existingData!.length} items in local storage' : 'No existing local data'}');
 
       // Test 2: Contribute test data directly to local storage
-      print('🔍 Test 2: Contributing test menu data to local storage...');
+      // print('🔍 Test 2: Contributing test menu data to local storage...');
       await _contributeCommunityMenuDataLocally(testRestaurantId, testItems, userId);
       results['tests']['contribution'] = {
         'status': 'completed',
@@ -386,10 +388,10 @@ class MongoDBDataSource {
         'storage_type': 'local',
         'timestamp': DateTime.now(),
       };
-      print('✅ Contribution completed: ${testItems.length} items to local storage');
+      // print('✅ Contribution completed: ${testItems.length} items to local storage');
 
       // Test 3: Verify data was saved in local storage
-      print('🔍 Test 3: Verifying data was saved in local storage...');
+      // print('🔍 Test 3: Verifying data was saved in local storage...');
       final savedData = await _getCommunityMenuDataLocally(testRestaurantId);
       results['tests']['post_contribution_check'] = {
         'exists': savedData != null,
@@ -398,11 +400,11 @@ class MongoDBDataSource {
         'storage_type': 'local',
         'status': 'completed'
       };
-      print('✅ Post-contribution check: ${savedData != null ? 'Found ${savedData!.length} items in local storage' : 'No data found!'}');
+      // print('✅ Post-contribution check: ${savedData != null ? 'Found ${savedData!.length} items in local storage' : 'No data found!'}');
 
       // Test 4: Verify item details match
       if (savedData != null && savedData.isNotEmpty) {
-        print('🔍 Test 4: Verifying item details integrity...');
+        // print('🔍 Test 4: Verifying item details integrity...');
         final firstOriginal = testItems.first;
         final firstSaved = savedData.first;
 
@@ -420,25 +422,25 @@ class MongoDBDataSource {
           'storage_type': 'local',
           'status': 'completed'
         };
-        print('✅ Data integrity check: All details match: ${nameMatch && priceMatch && descMatch}');
+        // print('✅ Data integrity check: All details match: ${nameMatch && priceMatch && descMatch}');
       }
 
       // Test 5: Test storage persistence (read from SharedPreferences directly)
-      print('🔍 Test 5: Testing SharedPreferences persistence...');
+      // print('🔍 Test 5: Testing SharedPreferences persistence...');
       await _testSharedPreferencesPersistence(testRestaurantId, results);
 
       // Test 6: Test multiple restaurant data
-      print('🔍 Test 6: Testing multiple restaurant data storage...');
+      // print('🔍 Test 6: Testing multiple restaurant data storage...');
       await _testMultipleRestaurantStorage(userId, results);
 
       results['overall_status'] = 'success';
       results['test_completed'] = DateTime.now();
 
-      print('🎉 Local storage data caching test completed successfully!');
+      // print('🎉 Local storage data caching test completed successfully!');
       return results;
 
     } catch (e) {
-      print('❌ Data caching test failed: $e');
+      // print('❌ Data caching test failed: $e');
       results['tests']['error'] = {
         'message': e.toString(),
         'timestamp': DateTime.now(),
@@ -470,7 +472,7 @@ class MongoDBDataSource {
           'storage_type': 'shared_preferences',
           'status': 'completed'
         };
-        print('✅ SharedPreferences persistence: Data found and valid');
+        // print('✅ SharedPreferences persistence: Data found and valid');
       } else {
         results['tests']['shared_preferences_persistence'] = {
           'key_exists': false,
@@ -478,11 +480,11 @@ class MongoDBDataSource {
           'storage_type': 'shared_preferences',
           'status': 'failed'
         };
-        print('❌ SharedPreferences persistence: No data found');
+        // print('❌ SharedPreferences persistence: No data found');
       }
 
     } catch (e) {
-      print('⚠️ SharedPreferences persistence test error: $e');
+      // print('⚠️ SharedPreferences persistence test error: $e');
       results['tests']['shared_preferences_persistence'] = {
         'error': e.toString(),
         'status': 'failed'
@@ -524,10 +526,10 @@ class MongoDBDataSource {
         'status': 'completed'
       };
 
-      print('✅ Multiple restaurant storage: ${restaurants.length} restaurants tested');
+      // print('✅ Multiple restaurant storage: ${restaurants.length} restaurants tested');
 
     } catch (e) {
-      print('⚠️ Multiple restaurant storage test error: $e');
+      // print('⚠️ Multiple restaurant storage test error: $e');
       results['tests']['multiple_restaurant_storage'] = {
         'error': e.toString(),
         'status': 'failed'
@@ -584,10 +586,10 @@ class MongoDBDataSource {
         'reason': 'Skipped - MongoDB Atlas connection times out',
         'skipped': true,
       };
-      print('⚠️ MongoDB Atlas: Skipped (known timeout issue)');
+      // print('⚠️ MongoDB Atlas: Skipped (known timeout issue)');
 
       // Focus on local storage data
-      print('🔍 Checking local storage data...');
+      // print('🔍 Checking local storage data...');
       final prefs = await SharedPreferences.getInstance();
 
       final menuKeys = prefs.getKeys().where((key) => key.startsWith('menu_data_')).toList();
@@ -625,15 +627,15 @@ class MongoDBDataSource {
           !key.startsWith('user_data_')).toList(),
       };
 
-      print('📊 Local Storage Analysis:');
-      print('   • Menu records: ${menuKeys.length}');
-      print('   • User records: ${userKeys.length}');
-      print('   • Total keys: ${allKeys.length}');
+      // print('📊 Local Storage Analysis:');
+      // print('   • Menu records: ${menuKeys.length}');
+      // print('   • User records: ${userKeys.length}');
+      // print('   • Total keys: ${allKeys.length}');
 
       return results;
 
     } catch (e) {
-      print('❌ Error viewing stored data: $e');
+      // print('❌ Error viewing stored data: $e');
       results['error'] = e.toString();
       return results;
     }
