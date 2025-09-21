@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:provider/provider.dart';
 import '../models/optimization_result.dart';
 import '../models/menu_item.dart';
+import '../services/theme_service.dart';
+import '../services/locale_service.dart';
 
 class ResultsDisplayWidget extends StatefulWidget {
   final List<OptimizationResult> results;
@@ -33,9 +36,17 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(20),
+        border: Theme.of(context).brightness == Brightness.dark
+            ? Border.all(
+                color: const Color(0xFF4A90E2).withValues(alpha: 0.3),
+                width: 1,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF4A90E2).withValues(alpha: 0.2)
+                : Colors.blue.withValues(alpha: 0.1),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -52,35 +63,39 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
                 topRight: Radius.circular(20),
               ),
             ),
-            child: TabBar(
-              controller: _tabController,
-              labelColor: Colors.blue[700],
-              unselectedLabelColor: Colors.grey[600],
-              indicatorColor: Colors.blue[700],
-              indicatorWeight: 3,
-              dividerColor: Colors.transparent,
-              tabs: [
-                Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.list_rounded, size: 20),
-                      const SizedBox(width: 8),
-                      const Text('Rankings', style: TextStyle(fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                ),
-                Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.analytics_rounded, size: 20),
-                      const SizedBox(width: 8),
-                      const Text('Analysis', style: TextStyle(fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                ),
-              ],
+            child: Consumer<LocaleService>(
+              builder: (context, localeService, child) {
+                return TabBar(
+                  controller: _tabController,
+                  labelColor: Colors.blue[700],
+                  unselectedLabelColor: Colors.grey[600],
+                  indicatorColor: Colors.blue[700],
+                  indicatorWeight: 3,
+                  dividerColor: Colors.transparent,
+                  tabs: [
+                    Tab(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.list_rounded, size: 20),
+                          const SizedBox(width: 8),
+                          Text(localeService.getLocalizedString('rankings'), style: const TextStyle(fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                    Tab(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.analytics_rounded, size: 20),
+                          const SizedBox(width: 8),
+                          Text(localeService.getLocalizedString('analysis'), style: const TextStyle(fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           SizedBox(
@@ -154,10 +169,10 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
         ),
         title: Text(
           result.menuItem.name,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 16,
-            color: Colors.black87,
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
           ),
         ),
         subtitle: Column(
@@ -554,7 +569,7 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
             .map((spot) => ScatterSpot(
                   spot.x,
                   spot.y,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.purple : Theme.of(context).primaryColor,
                   radius: 6,
                 ))
             .toList(),
@@ -617,13 +632,17 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
             : prices[prices.length ~/ 2]
         : 0.0;
 
-    return Column(
-      children: [
-        _buildStatCard('Items Analyzed', widget.results.length.toString()),
-        _buildStatCard('Average Score', '${(avgScore * 100).toStringAsFixed(1)}%'),
-        _buildStatCard('Average Price', '\$${avgPrice.toStringAsFixed(2)}'),
-        _buildStatCard('Median Price', '\$${medianPrice.toStringAsFixed(2)}'),
-      ],
+    return Consumer<LocaleService>(
+      builder: (context, localeService, child) {
+        return Column(
+          children: [
+            _buildStatCard(localeService.getLocalizedString('items_analyzed'), widget.results.length.toString()),
+            _buildStatCard(localeService.getLocalizedString('average_score'), '${(avgScore * 100).toStringAsFixed(1)}%'),
+            _buildStatCard(localeService.getLocalizedString('average_price'), '\$${avgPrice.toStringAsFixed(2)}'),
+            _buildStatCard(localeService.getLocalizedString('median_price'), '\$${medianPrice.toStringAsFixed(2)}'),
+          ],
+        );
+      },
     );
   }
 
@@ -649,9 +668,9 @@ class _ResultsDisplayWidgetState extends State<ResultsDisplayWidget>
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
               ),
               overflow: TextOverflow.ellipsis,
             ),

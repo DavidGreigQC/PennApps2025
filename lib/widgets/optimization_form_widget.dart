@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/optimization_criteria.dart';
+import '../services/theme_service.dart';
+import '../services/locale_service.dart';
 
 class OptimizationFormWidget extends StatefulWidget {
   final Function(OptimizationRequest) onOptimizationRequest;
@@ -97,19 +100,23 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.settings_rounded, size: 20),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Set Optimization Criteria',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                child: Consumer<LocaleService>(
+                  builder: (context, localeService, child) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.settings_rounded, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          localeService.getLocalizedString('set_optimization_criteria'),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),
@@ -153,12 +160,16 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    'Restaurant Information',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
-                    ),
+                  child: Consumer<LocaleService>(
+                    builder: (context, localeService, child) {
+                      return Text(
+                        localeService.getLocalizedString('restaurant_information'),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[800],
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Container(
@@ -167,13 +178,17 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                     color: Theme.of(context).cardTheme.color ?? Colors.grey[100],
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    'Optional',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                    ),
+                  child: Consumer<LocaleService>(
+                    builder: (context, localeService, child) {
+                      return Text(
+                        localeService.getLocalizedString('optional'),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -246,9 +261,17 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(20),
+        border: Theme.of(context).brightness == Brightness.dark
+            ? Border.all(
+                color: const Color(0xFF4A90E2).withValues(alpha: 0.3),
+                width: 1,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF4A90E2).withValues(alpha: 0.2)
+                : Colors.blue.withValues(alpha: 0.1),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -275,12 +298,16 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    'Optimization Goals',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
-                    ),
+                  child: Consumer<LocaleService>(
+                    builder: (context, localeService, child) {
+                      return Text(
+                        localeService.getLocalizedString('optimization_goals'),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[800],
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Material(
@@ -349,13 +376,17 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    'Optimization Goal',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
-                      fontSize: 16,
-                    ),
+                  child: Consumer<LocaleService>(
+                    builder: (context, localeService, child) {
+                      return Text(
+                        localeService.getLocalizedString('optimization_goal'),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[800],
+                          fontSize: 16,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Material(
@@ -542,13 +573,17 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                     children: [
                       Icon(Icons.flag_rounded, color: Colors.orange[600], size: 18),
                       const SizedBox(width: 8),
-                      Text(
-                        'Optimization Goal',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.orange[700],
-                          fontSize: 14,
-                        ),
+                      Consumer<LocaleService>(
+                        builder: (context, localeService, child) {
+                          return Text(
+                            localeService.getLocalizedString('optimization_goal'),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.orange[700],
+                              fontSize: 14,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -690,12 +725,16 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    'Dietary Constraints',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
-                    ),
+                  child: Consumer<LocaleService>(
+                    builder: (context, localeService, child) {
+                      return Text(
+                        localeService.getLocalizedString('dietary_constraints'),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[800],
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -716,13 +755,17 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
                       children: [
                         Icon(Icons.attach_money, color: Colors.green[600], size: 20),
                         const SizedBox(width: 8),
-                        Text(
-                          'Budget',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[700],
-                            fontSize: 14,
-                          ),
+                        Consumer<LocaleService>(
+                          builder: (context, localeService, child) {
+                            return Text(
+                              localeService.getLocalizedString('budget'),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[700],
+                                fontSize: 14,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),

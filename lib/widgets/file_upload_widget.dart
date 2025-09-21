@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import '../services/theme_service.dart';
+import '../services/locale_service.dart';
 
 class FileUploadWidget extends StatefulWidget {
   final Function(List<String>) onFilesSelected;
@@ -21,18 +24,28 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color ?? Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+    return Consumer2<ThemeService, LocaleService>(
+      builder: (context, themeService, localeService, child) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardTheme.color ?? Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: themeService.isDarkMode
+                ? Border.all(
+                    color: const Color(0xFF4A90E2).withValues(alpha: 0.3),
+                    width: 1,
+                  )
+                : null,
+            boxShadow: [
+              BoxShadow(
+                color: themeService.isDarkMode
+                    ? const Color(0xFF4A90E2).withValues(alpha: 0.2)
+                    : Colors.blue.withValues(alpha: 0.1),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -56,10 +69,10 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Upload Menu Files',
+                    localeService.getLocalizedString('upload_menu_files'),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
+                      color: themeService.isDarkMode ? Colors.white : Colors.grey[800],
                     ),
                   ),
                 ),
@@ -83,10 +96,10 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                       Icon(Icons.camera_alt_rounded, color: Colors.blue[600], size: 18),
                       const SizedBox(width: 8),
                       Text(
-                        'Upload Methods',
+                        localeService.getLocalizedString('upload_methods'),
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey[700],
+                          color: themeService.isDarkMode ? Colors.white : Colors.grey[700],
                           fontSize: 14,
                         ),
                       ),
@@ -97,24 +110,24 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                     children: [
                       _buildUploadOption(
                         icon: Icons.camera_alt_rounded,
-                        title: 'Camera',
-                        subtitle: 'Take Photo',
+                        title: localeService.getLocalizedString('camera'),
+                        subtitle: localeService.getLocalizedString('take_photo'),
                         color: Colors.green,
                         onTap: _takePhoto,
                       ),
                       const SizedBox(height: 12),
                       _buildUploadOption(
                         icon: Icons.photo_library_rounded,
-                        title: 'Gallery',
-                        subtitle: 'Photos',
+                        title: localeService.getLocalizedString('gallery'),
+                        subtitle: localeService.getLocalizedString('photos'),
                         color: Colors.orange,
                         onTap: _pickFromGallery,
                       ),
                       const SizedBox(height: 12),
                       _buildUploadOption(
                         icon: Icons.upload_file_rounded,
-                        title: 'Files',
-                        subtitle: 'PDF/Image',
+                        title: localeService.getLocalizedString('files'),
+                        subtitle: localeService.getLocalizedString('pdf_image'),
                         color: Colors.purple,
                         onTap: _pickFiles,
                       ),
@@ -141,7 +154,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                       Icon(Icons.link_rounded, color: Colors.blue[600], size: 18),
                       const SizedBox(width: 8),
                       Text(
-                        'Menu URL',
+                        localeService.getLocalizedString('menu_url'),
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.blue[700],
@@ -154,7 +167,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                   TextField(
                     controller: _urlController,
                     decoration: InputDecoration(
-                      labelText: 'Enter menu website URL',
+                      labelText: localeService.getLocalizedString('enter_menu_website_url'),
                       hintText: 'https://example.com/menu',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -214,7 +227,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                                   Icon(Icons.clear_rounded, color: Colors.red[600], size: 16),
                                   const SizedBox(width: 6),
                                   Text(
-                                    'Clear All',
+                                    localeService.getLocalizedString('clear_all'),
                                     style: TextStyle(
                                       color: Colors.red[600],
                                       fontSize: 12,
@@ -231,7 +244,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Selected Files (${_selectedFilesAndUrls.length})',
+                            '${localeService.getLocalizedString('selected_files')} (${_selectedFilesAndUrls.length})',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: Colors.green[700],
@@ -250,6 +263,8 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
           ],
         ),
       ),
+        );
+      },
     );
   }
 
