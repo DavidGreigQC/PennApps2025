@@ -285,15 +285,86 @@ class OCRService {
   }
 
   String _cleanItemName(String name) {
-    return name
+    String cleaned = name
         .replaceAll(RegExp(r'\$\d+\.?\d*'), '') // Remove any prices
         .replaceAll(RegExp(r's\d+\.?\d*'), '') // Remove OCR price errors like "s13.15"
         .replaceAll(RegExp(r'\.\.\.+s?\d+\.?\d*'), '') // Remove "...s30.75" patterns
+        .replaceAll(RegExp(r'Instructions?', caseSensitive: false), '') // Remove "Instructions"
+        .replaceAll(RegExp(r'Special', caseSensitive: false), '') // Remove "Special"
+        .replaceAll(RegExp(r'\bLow\s+Fat\b', caseSensitive: false), '') // Remove "Low Fat"
+        .replaceAll(RegExp(r'\bOwn\b', caseSensitive: false), '') // Remove standalone "Own"
+        .replaceAll(RegExp(r'\bDre\b', caseSensitive: false), '') // Remove "Dre" fragments
+        .replaceAll(RegExp(r'ssingn?e?w?m?a?n?', caseSensitive: false), '') // Remove OCR fragments
+        .replaceAll(RegExp(r'Qtybeveragess?', caseSensitive: false), '') // Remove OCR errors
+        .replaceAll(RegExp(r'\bpecial\b', caseSensitive: false), '') // Remove "pecial" fragment
+        .replaceAll(RegExp(r'\bJug\b(?!\s+(Low|Fat|Milk))', caseSensitive: false), '') // Remove standalone "Jug"
         .replaceAll(RegExp(r'^\W+'), '') // Remove leading non-word chars
         .replaceAll(RegExp(r'\W+$'), '') // Remove trailing non-word chars
         .replaceAll(RegExp(r'\.{2,}'), '') // Remove multiple dots
         .replaceAll(RegExp(r'\s+'), ' ') // Normalize whitespace
         .trim();
+
+    // Additional cleanup: Split by potential separators and find the best part
+    List<String> segments = cleaned.split(RegExp(r'[\n\r,;]'));
+    String bestSegment = '';
+
+    for (String segment in segments) {
+      segment = segment.trim();
+      if (segment.length >= 3 && segment.length <= 40 && _isLikelyMenuItemName(segment)) {
+        if (segment.length > bestSegment.length) {
+          bestSegment = segment;
+        }
+      }
+    }
+
+    // If we found a good segment, use it; otherwise return cleaned version
+    String result = bestSegment.isNotEmpty ? bestSegment : cleaned;
+
+    // Final cleanup: ensure proper capitalization
+    if (result.isNotEmpty) {
+      result = _capitalizeItemName(result);
+    }
+
+    return result;
+  }
+
+  /// Check if a string looks like a menu item name (not just fragments)
+  bool _isLikelyMenuItemName(String text) {
+    if (text.length < 3 || text.length > 40) return false;
+
+    String lowerText = text.toLowerCase();
+
+    // Skip obvious non-menu items
+    List<String> skipPatterns = [
+      'instructions', 'special', 'own', 'creamy', 'low fat', 'jug low',
+      'qtybeveragess', 'dressing newman', 'pecial', 'ssingnewman'
+    ];
+
+    for (String pattern in skipPatterns) {
+      if (lowerText.contains(pattern)) return false;
+    }
+
+    // Check for food-related words
+    List<String> foodWords = [
+      'burger', 'sandwich', 'salad', 'pizza', 'pasta', 'chicken', 'beef',
+      'fish', 'fries', 'drink', 'coffee', 'tea', 'juice', 'soda', 'water',
+      'cheese', 'bacon', 'ham', 'turkey', 'wrap', 'bowl', 'soup', 'bread',
+      'muffin', 'cake', 'pie', 'cream', 'shake', 'smoothie', 'milk',
+      'dressing', 'sauce', 'combo', 'meal', 'classic', 'deluxe', 'chocolate'
+    ];
+
+    bool hasFoodWord = foodWords.any((word) => lowerText.contains(word));
+    bool hasProperStructure = RegExp(r'^[A-Za-z][A-Za-z\s]*[A-Za-z]$').hasMatch(text);
+
+    return hasFoodWord || hasProperStructure;
+  }
+
+  /// Capitalize menu item names properly
+  String _capitalizeItemName(String name) {
+    return name.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
   }
 
   bool _isDuplicate(List<MenuItem> items, String name, double price) {

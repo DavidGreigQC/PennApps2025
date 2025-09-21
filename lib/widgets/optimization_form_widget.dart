@@ -44,6 +44,7 @@ class _OptimizationFormWidgetState extends State<OptimizationFormWidget> {
     CriteriaOption('protein', 'High Protein', 'Maximize protein content'),
     CriteriaOption('fiber', 'High Fiber', 'Maximize fiber content'),
     CriteriaOption('nutrient_density', 'Nutrient Density', 'Maximize nutrients per calorie'),
+    CriteriaOption('public_opinion', 'Public Opinion', 'Prioritize items with positive reviews and high popularity'),
   ];
 
   @override

@@ -82,19 +82,27 @@ class NutritionalDataService {
       nutritionData = await _searchGenericFoodDatabase(item.name);
     }
 
-    // If item has no price, attempt to look it up online
+    // Price validation and correction logic
     if (item.price == 0.0) {
+      // No price - attempt to look it up online first
       double? lookedUpPrice = await _lookupPrice(item.name, restaurantName);
-      if (lookedUpPrice != null) {
-        // Create a copy with the found price
+      if (lookedUpPrice != null && _isPriceReasonable(lookedUpPrice, item.name)) {
         item = item.copyWith(price: lookedUpPrice);
         debugPrint('PRICE LOOKUP: Found ${item.name} = \$${lookedUpPrice}');
       } else {
-        // Set estimated price based on item type if still 0
+        // Use fallback estimation
         double estimatedPrice = _estimatePrice(item.name, restaurantName);
         item = item.copyWith(price: estimatedPrice);
         debugPrint('PRICE ESTIMATE: ${item.name} = \$${estimatedPrice} (estimated)');
       }
+    } else if (!_isPriceReasonable(item.price, item.name)) {
+      // Price exists but is unreasonable - check if it was already estimated
+      debugPrint('⚠️ EXTREME PRICE DETECTED: ${item.name} = \$${item.price}');
+
+      // Try to get a reasonable price estimate
+      double reasonablePrice = await _getReasonablePriceWithAI(item.name, restaurantName, item.price);
+      item = item.copyWith(price: reasonablePrice);
+      debugPrint('PRICE CORRECTED: ${item.name} = \$${reasonablePrice} (was \$${item.price})');
     }
 
     if (nutritionData != null) {
@@ -352,6 +360,85 @@ class NutritionalDataService {
       debugPrint('Price lookup failed for $itemName: $e');
       return null;
     }
+  }
+
+  /// Check if a price is reasonable for a given menu item
+  bool _isPriceReasonable(double price, String itemName) {
+    String lowerName = itemName.toLowerCase();
+
+    // Define reasonable price ranges for different item types
+    if (lowerName.contains('drink') || lowerName.contains('soda') || lowerName.contains('beverage')) {
+      return price >= 1.0 && price <= 8.0;  // Drinks: $1-8
+    }
+
+    if (lowerName.contains('side') || lowerName.contains('fries') || lowerName.contains('appetizer')) {
+      return price >= 2.0 && price <= 12.0;  // Sides: $2-12
+    }
+
+    if (lowerName.contains('dessert') || lowerName.contains('cake') || lowerName.contains('ice cream')) {
+      return price >= 2.0 && price <= 15.0;  // Desserts: $2-15
+    }
+
+    if (lowerName.contains('salad')) {
+      return price >= 4.0 && price <= 18.0;  // Salads: $4-18
+    }
+
+    if (lowerName.contains('pizza')) {
+      return price >= 8.0 && price <= 30.0;  // Pizza: $8-30
+    }
+
+    if (lowerName.contains('burger') || lowerName.contains('sandwich')) {
+      return price >= 5.0 && price <= 25.0;  // Burgers/Sandwiches: $5-25
+    }
+
+    if (lowerName.contains('meal') || lowerName.contains('combo') || lowerName.contains('platter')) {
+      return price >= 8.0 && price <= 35.0;  // Meals/Combos: $8-35
+    }
+
+    // General reasonable range for any menu item
+    return price >= 1.0 && price <= 50.0;
+  }
+
+  /// Get a reasonable price using AI validation and fallback estimation
+  Future<double> _getReasonablePriceWithAI(String itemName, String? restaurantName, double currentPrice) async {
+    // First try to get AI-validated price
+    if (_geminiModel != null) {
+      try {
+        String context = restaurantName != null
+            ? 'This is a menu item from $restaurantName restaurant'
+            : 'This is a generic menu item';
+
+        String prompt = '''
+$context. The item "$itemName" currently has a price of \$${currentPrice.toStringAsFixed(2)}.
+
+This price seems unreasonable. Please provide a realistic price estimate for this item.
+Consider typical prices for similar items at similar restaurants.
+
+Respond with ONLY a number (the price in dollars, like 12.99). No explanations or currency symbols.
+''';
+
+        final response = await _geminiModel!.generateContent([Content.text(prompt)]);
+        final text = response.text?.trim();
+
+        if (text != null) {
+          // Extract number from response
+          final priceMatch = RegExp(r'(\d+\.\d+|\d+)').firstMatch(text);
+          if (priceMatch != null) {
+            double aiPrice = double.parse(priceMatch.group(1)!);
+            if (_isPriceReasonable(aiPrice, itemName)) {
+              debugPrint('AI PRICE CORRECTION: ${itemName} = \$${aiPrice}');
+              return aiPrice;
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('AI price validation failed: $e');
+      }
+    }
+
+    // Fallback to rule-based estimation
+    debugPrint('Using rule-based price estimation for ${itemName}');
+    return _estimatePrice(itemName, restaurantName);
   }
 
   /// Estimate reasonable price based on item type and restaurant

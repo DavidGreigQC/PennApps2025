@@ -83,6 +83,17 @@ class MenuOptimizationService extends ChangeNotifier {
       _status = 'Running optimization analysis on ${finalValidatedItems.length} validated menu items...';
       notifyListeners();
 
+      // Check if public opinion is included in criteria, and preload if needed
+      bool hasPublicOpinion = request.criteria.any((c) => c.name.toLowerCase() == 'public_opinion');
+      if (hasPublicOpinion) {
+        _status = 'Analyzing public opinion and reviews...';
+        notifyListeners();
+        await _optimizationEngine.preloadOpinionScores(finalValidatedItems, request.restaurantName);
+      }
+
+      _status = 'Finalizing optimization analysis...';
+      notifyListeners();
+
       _paretoFrontier = await _optimizationEngine.optimize(finalValidatedItems, request);
       _results = _paretoFrontier!.getTopResults(10);
 

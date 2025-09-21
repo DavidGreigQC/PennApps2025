@@ -3,12 +3,19 @@ import 'package:flutter/foundation.dart';
 import '../models/menu_item.dart';
 import '../models/optimization_criteria.dart';
 import '../models/optimization_result.dart';
+import 'public_opinion_service.dart';
 
 class OptimizationEngine {
+  // Cache for public opinion scores to avoid repeated API calls
+  final Map<String, double> _opinionCache = {};
+  String? _currentRestaurantName;
   Future<ParetoFrontier> optimize(
     List<MenuItem> items,
     OptimizationRequest request,
   ) async {
+    // Store restaurant name for opinion analysis
+    _currentRestaurantName = request.restaurantName;
+    _opinionCache.clear(); // Clear cache for new optimization
     // CRITICAL: Validate input - only process items that were provided
     if (items.isEmpty) {
       throw Exception('No menu items provided for optimization');
@@ -80,6 +87,37 @@ class OptimizationEngine {
     return totalWeight > 0 ? totalScore / totalWeight : 0.0;
   }
 
+  /// Get cached public opinion score (async operation made sync through caching)
+  double _getCachedOpinionScore(MenuItem item) {
+    final key = '${item.name}_${_currentRestaurantName ?? ""}';
+    return _opinionCache[key] ?? 0.5; // Default neutral score if not cached
+  }
+
+  /// Pre-populate opinion scores for all items (call before optimization)
+  Future<void> preloadOpinionScores(List<MenuItem> items, String? restaurantName) async {
+    try {
+      debugPrint('🔍 Preloading public opinion scores for ${items.length} items...');
+
+      final opinionService = PublicOpinionService.instance;
+      final scores = await opinionService.getBatchOpinionScores(items, restaurantName);
+
+      // Cache the scores
+      for (final item in items) {
+        final key = '${item.name}_${restaurantName ?? ""}';
+        _opinionCache[key] = scores[item.name] ?? 0.5;
+      }
+
+      debugPrint('✅ Cached ${_opinionCache.length} opinion scores');
+    } catch (e) {
+      debugPrint('⚠️ Failed to preload opinion scores: $e');
+      // Fill cache with default values
+      for (final item in items) {
+        final key = '${item.name}_${restaurantName ?? ""}';
+        _opinionCache[key] = 0.5;
+      }
+    }
+  }
+
   Map<String, double> _calculateCriteriaScores(MenuItem item, List<OptimizationCriteria> criteria) {
     Map<String, double> scores = {};
 
@@ -117,6 +155,8 @@ class OptimizationEngine {
         return item.sodium ?? 0.0;
       case 'sugar':
         return item.sugar ?? 0.0;
+      case 'public_opinion':
+        return _getCachedOpinionScore(item);
       default:
         return 0.0;
     }
