@@ -17,7 +17,7 @@ class NutritionalDataService {
 
       if (apiKey != null && apiKey.isNotEmpty && apiKey != 'YOUR_GEMINI_API_KEY') {
         _geminiModel = GenerativeModel(
-          model: 'gemini-pro',
+          model: 'gemini-1.5-flash',
           apiKey: apiKey,
         );
         debugPrint('✅ Gemini AI initialized for nutrition estimation');

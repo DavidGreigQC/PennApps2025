@@ -6,6 +6,8 @@ import '../models/optimization_result.dart';
 import 'ocr_service.dart';
 import 'nutritional_data_service.dart';
 import 'optimization_engine.dart';
+import 'optimization_progress_service.dart';
+import 'money_savings_service.dart';
 
 class MenuOptimizationService extends ChangeNotifier {
   bool _isProcessing = false;
@@ -88,6 +90,11 @@ class MenuOptimizationService extends ChangeNotifier {
       _results = _validateRecommendations(_results);
 
       _status = 'Analysis complete! Found ${_results.length} optimal recommendations.';
+
+      // Track optimization progress and calculate savings
+      await _trackOptimizationProgress();
+      await _calculateAndTrackSavings();
+
       notifyListeners();
 
     } catch (e) {
@@ -188,5 +195,46 @@ class MenuOptimizationService extends ChangeNotifier {
         .trim()
         .replaceAll(RegExp(r'[^\w\s]'), '') // Remove special characters
         .replaceAll(RegExp(r'\s+'), ' '); // Normalize whitespace
+  }
+
+  /// Track optimization progress for the graph
+  Future<void> _trackOptimizationProgress() async {
+    try {
+      if (_results.isNotEmpty) {
+        // Find the highest optimization score from results
+        double highestScore = 0.0;
+        for (OptimizationResult result in _results) {
+          if (result.optimizationScore > highestScore) {
+            highestScore = result.optimizationScore;
+          }
+        }
+        double optimizationPercentage = (highestScore * 100).clamp(0.0, 100.0);
+
+        // Save to optimization progress service
+        await OptimizationProgressService.instance.addOptimizationResult(optimizationPercentage);
+
+        debugPrint('📈 Optimization progress tracked (highest): ${optimizationPercentage.toStringAsFixed(1)}%');
+      }
+    } catch (e) {
+      debugPrint('Error tracking optimization progress: $e');
+    }
+  }
+
+  /// Calculate and track estimated money savings
+  Future<void> _calculateAndTrackSavings() async {
+    try {
+      if (_results.isNotEmpty && _extractedItems.isNotEmpty) {
+        // Calculate savings from this optimization session
+        double sessionSavings = await MoneySavingsService.instance.addOptimizationSavings(_results, _extractedItems);
+
+        debugPrint('💰 Estimated savings from this optimization: \$${sessionSavings.toStringAsFixed(2)}');
+
+        // Get total savings for logging
+        double totalSavings = await MoneySavingsService.instance.getTotalSavings();
+        debugPrint('💰 Total estimated savings: \$${totalSavings.toStringAsFixed(2)}');
+      }
+    } catch (e) {
+      debugPrint('Error calculating savings: $e');
+    }
   }
 }

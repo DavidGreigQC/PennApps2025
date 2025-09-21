@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'home_screen.dart';
 import '../services/menu_optimization_service.dart';
 import '../services/theme_service.dart';
+import '../services/optimization_progress_service.dart';
+import '../services/money_savings_service.dart';
 import '../widgets/settings_popup.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -16,14 +18,41 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveClientMixin {
   final int _currentPage = 0; // Always 0 for home page
 
-  // Hard-coded data for demo
-  final double estimatedSavings = 247.85;
-  final List<double> last10OptimizationPercents = [
-    23.5, 18.2, 31.7, 15.4, 28.9, 22.1, 35.2, 19.6, 26.8, 42.3
-  ];
+  double _estimatedSavings = 0.0;
+  List<double> _optimizationPercents = [];
+  bool _isLoadingData = true;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOptimizationData();
+  }
+
+  Future<void> _loadOptimizationData() async {
+    try {
+      final optimizationData = await OptimizationProgressService.instance.getOptimizationHistory();
+      final savingsData = await MoneySavingsService.instance.getTotalSavings();
+
+      if (mounted) {
+        setState(() {
+          _optimizationPercents = optimizationData;
+          _estimatedSavings = savingsData;
+          _isLoadingData = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _optimizationPercents = [];
+          _estimatedSavings = 0.0;
+          _isLoadingData = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -246,7 +275,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        '\$${estimatedSavings.toStringAsFixed(2)}',
+                        '\$${_estimatedSavings.toStringAsFixed(2)}',
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w800,
@@ -373,7 +402,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Last 10 Optimizations',
+                        'Last 10 Best Optimization Results',
                         style: TextStyle(
                           color: themeService.isDarkMode
                               ? Colors.white60
@@ -385,7 +414,44 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
                       const SizedBox(height: 16),
                       SizedBox(
                         height: 200,
-                        child: LineChart(
+                        child: _optimizationPercents.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.analytics_outlined,
+                                      size: 48,
+                                      color: themeService.isDarkMode
+                                          ? Colors.white30
+                                          : Colors.grey[400],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'No optimization data yet',
+                                      style: TextStyle(
+                                        color: themeService.isDarkMode
+                                            ? Colors.white60
+                                            : Colors.grey[600],
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Complete an optimization to see your progress',
+                                      style: TextStyle(
+                                        color: themeService.isDarkMode
+                                            ? Colors.white.withValues(alpha: 0.4)
+                                            : Colors.grey[500],
+                                        fontSize: 12,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : LineChart(
                           LineChartData(
                             lineTouchData: LineTouchData(
                               touchTooltipData: LineTouchTooltipData(
@@ -480,12 +546,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
                               ),
                             ),
                             minX: 0,
-                            maxX: 9,
+                            maxX: _optimizationPercents.length > 1 ? (_optimizationPercents.length - 1).toDouble() : 9,
                             minY: 0,
-                            maxY: 50,
+                            maxY: _optimizationPercents.isEmpty ? 50 : (_optimizationPercents.reduce((a, b) => a > b ? a : b) * 1.2).clamp(10, double.infinity),
                             lineBarsData: [
                               LineChartBarData(
-                                spots: last10OptimizationPercents.asMap().entries.map((e) {
+                                spots: _optimizationPercents.asMap().entries.map((e) {
                                   return FlSpot(e.key.toDouble(), e.value);
                                 }).toList(),
                                 isCurved: true,
@@ -555,7 +621,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
                                 ),
                               ),
                               Text(
-                                '${(last10OptimizationPercents.reduce((a, b) => a + b) / last10OptimizationPercents.length).toStringAsFixed(1)}%',
+                                '${_optimizationPercents.isEmpty ? "0.0" : (_optimizationPercents.reduce((a, b) => a + b) / _optimizationPercents.length).toStringAsFixed(1)}%',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: themeService.isDarkMode
@@ -579,7 +645,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
                                 ),
                               ),
                               Text(
-                                '${last10OptimizationPercents.reduce((a, b) => a > b ? a : b).toStringAsFixed(1)}%',
+                                '${_optimizationPercents.isEmpty ? "0.0" : _optimizationPercents.reduce((a, b) => a > b ? a : b).toStringAsFixed(1)}%',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: themeService.isDarkMode
@@ -600,7 +666,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> with AutomaticKeepAliveCl
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigation(),
+      bottomNavigationBar: Consumer<MenuOptimizationService>(
+        builder: (context, service, child) {
+          // Refresh optimization data when optimization completes
+          if (!service.isProcessing && service.results.isNotEmpty && !_isLoadingData) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _loadOptimizationData();
+            });
+          }
+          return _buildBottomNavigation();
+        },
+      ),
     );
   }
 
