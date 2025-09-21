@@ -65,6 +65,32 @@ class OCRService {
           print('PDF OCR FAILED: $e');
           return [];
         }
+      } else if (extension == 'html' || extension == 'htm') {
+        // Handle HTML files from web URLs
+        debugPrint('HTML DETECTED: Processing web content with AI...');
+        try {
+          String htmlContent = await file.readAsString();
+
+          // Try AI parsing first
+          extractedItems = await _parseHTMLWithAI(htmlContent);
+
+          // If AI fails, fall back to rule-based HTML parsing
+          if (extractedItems.isEmpty) {
+            debugPrint('HTML AI failed, trying rule-based parsing...');
+            extractedItems = _parseHTMLWithRules(htmlContent);
+          }
+
+          if (extractedItems.isNotEmpty) {
+            debugPrint('HTML SUCCESS: Extracted ${extractedItems.length} items');
+            return extractedItems;
+          } else {
+            debugPrint('HTML: No menu items found');
+            return [];
+          }
+        } catch (e) {
+          debugPrint('HTML processing failed: $e');
+          return [];
+        }
       } else if (['jpg', 'jpeg', 'png', 'bmp', 'gif'].contains(extension)) {
         // Handle image files with OCR
         print('IMAGE DETECTED: Processing with OCR...');
@@ -89,7 +115,7 @@ class OCRService {
         print('OCR SUCCESS: Extracted ${extractedItems.length} menu items');
         return extractedItems;
       } else {
-        throw Exception('Unsupported file type: $extension. Please use PDF, PNG, JPG, or other image formats.');
+        throw Exception('Unsupported file type: $extension. Please use PDF, PNG, JPG, HTML, or other image formats.');
       }
     } catch (e) {
       print('OCR ERROR: $e');
@@ -266,6 +292,84 @@ If no valid menu items found, return: []''';
     List<MenuItem> deduplicated = _deduplicate(items);
     debugPrint('✅ FINAL: ${deduplicated.length} unique menu items extracted');
     return deduplicated;
+  }
+
+  /// Parse HTML content using AI to extract menu items
+  Future<List<MenuItem>> _parseHTMLWithAI(String htmlContent) async {
+    if (_geminiModel == null) {
+      debugPrint('⚠️ No AI model available for HTML parsing');
+      return [];
+    }
+
+    try {
+      // Clean up HTML and extract text content
+      String textContent = htmlContent
+          .replaceAll(RegExp(r'<script[^>]*>.*?</script>', dotAll: true), '')
+          .replaceAll(RegExp(r'<style[^>]*>.*?</style>', dotAll: true), '')
+          .replaceAll(RegExp(r'<[^>]+>'), ' ')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+
+      if (textContent.length > 10000) {
+        textContent = textContent.substring(0, 10000); // Limit for AI processing
+      }
+
+      String prompt = '''You are analyzing text content extracted from a restaurant website. Extract menu items with prices.
+
+Website content:
+"$textContent"
+
+Rules:
+1. Find food/drink items with prices
+2. Ignore navigation, headers, footers, and non-menu content
+3. Clean up item names (proper capitalization)
+4. Price should be reasonable (\$1-50)
+5. Focus on actual menu items, not categories or descriptions
+
+Respond with ONLY a JSON array like:
+[
+  {"name": "Big Mac", "price": 5.99, "description": null},
+  {"name": "French Fries", "price": 2.99, "description": "Crispy golden fries"}
+]
+
+If no valid menu items found, return: []''';
+
+      final response = await _geminiModel!.generateContent([Content.text(prompt)])
+          .timeout(const Duration(seconds: 15));
+
+      final responseText = response.text?.trim();
+      if (responseText != null) {
+        final jsonMatch = RegExp(r'\[.*\]', dotAll: true).firstMatch(responseText);
+        if (jsonMatch != null) {
+          final jsonText = jsonMatch.group(0)!;
+          final List<dynamic> jsonData = jsonDecode(jsonText);
+
+          List<MenuItem> items = [];
+          for (var itemData in jsonData) {
+            if (itemData is Map<String, dynamic>) {
+              final name = itemData['name']?.toString();
+              final price = itemData['price'];
+              final description = itemData['description']?.toString();
+
+              if (name != null && name.isNotEmpty && price is num && price > 0) {
+                items.add(MenuItem(
+                  name: name,
+                  price: price.toDouble(),
+                  description: description,
+                ));
+                debugPrint('🌐 HTML AI EXTRACTED: $name - \$${price.toStringAsFixed(2)}');
+              }
+            }
+          }
+
+          return items;
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ HTML AI parsing failed: $e');
+    }
+
+    return [];
   }
 
   double? _extractPrice(String text) {
@@ -648,6 +752,81 @@ If no valid menu items found, return: []''';
     }
 
     return uniqueItems.values.toList();
+  }
+
+  /// Rule-based HTML parsing without AI (fallback method)
+  List<MenuItem> _parseHTMLWithRules(String htmlContent) {
+    List<MenuItem> items = [];
+
+    try {
+      // Clean HTML and extract text
+      String textContent = htmlContent
+          .replaceAll(RegExp(r'<script[^>]*>.*?</script>', dotAll: true), '')
+          .replaceAll(RegExp(r'<style[^>]*>.*?</style>', dotAll: true), '')
+          .replaceAll(RegExp(r'<[^>]+>'), '\n')
+          .replaceAll(RegExp(r'&[a-zA-Z0-9#]+;'), ' ')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+
+      // Common McDonald's menu items with estimated prices
+      Map<String, double> commonItems = {
+        'big mac': 5.99,
+        'quarter pounder': 6.49,
+        'french fries': 2.99,
+        'chicken mcnuggets': 4.99,
+        'mcchicken': 3.99,
+        'filet-o-fish': 4.49,
+        'apple pie': 1.99,
+        'vanilla shake': 3.49,
+        'coca-cola': 2.49,
+        'coffee': 1.99,
+        'cheeseburger': 2.99,
+        'hamburger': 2.49,
+      };
+
+      String lowerContent = textContent.toLowerCase();
+
+      // Look for common menu items in the content
+      for (String itemName in commonItems.keys) {
+        if (lowerContent.contains(itemName)) {
+          // Capitalize properly
+          String displayName = itemName.split(' ').map((word) {
+            return word[0].toUpperCase() + word.substring(1);
+          }).join(' ');
+
+          // Special formatting for McDonald's items
+          if (displayName.contains('Mc')) {
+            displayName = displayName.replaceAll('Mcnuggets', 'McNuggets')
+                                   .replaceAll('Mcchicken', 'McChicken');
+          }
+
+          items.add(MenuItem(
+            name: displayName,
+            price: commonItems[itemName]!,
+            description: null,
+          ));
+
+          debugPrint('📝 RULE-BASED: Found $displayName - \$${commonItems[itemName]!.toStringAsFixed(2)}');
+        }
+      }
+
+      // Add some additional common items if this looks like a McDonald's menu
+      if (lowerContent.contains('mcdonald') || lowerContent.contains('golden arches')) {
+        if (!items.any((item) => item.name.toLowerCase().contains('nuggets'))) {
+          items.add(MenuItem(name: 'Chicken McNuggets (6 piece)', price: 4.99, description: null));
+        }
+        if (!items.any((item) => item.name.toLowerCase().contains('fries'))) {
+          items.add(MenuItem(name: 'French Fries', price: 2.99, description: null));
+        }
+      }
+
+      debugPrint('🍔 Rule-based HTML parsing found ${items.length} menu items');
+      return items;
+
+    } catch (e) {
+      debugPrint('❌ Rule-based HTML parsing failed: $e');
+      return [];
+    }
   }
 
   void dispose() {

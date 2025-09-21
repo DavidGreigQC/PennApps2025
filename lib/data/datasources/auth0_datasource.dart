@@ -162,7 +162,8 @@ class Auth0DataSource {
 
       return null;
     } catch (e) {
-      print('⚠️ Error getting stored credentials: $e');
+      // Suppress credentials warning - this is expected when no credentials are stored
+      // print('⚠️ Error getting stored credentials: $e');
       return null;
     }
   }
