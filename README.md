@@ -1,68 +1,104 @@
-# Menu Optimizer App
+# MenuMax 🍽️✨
 
-A Flutter application that optimizes menu selections using weighted multi-objective optimization algorithms.
+**AI-powered menu optimization that transforms any restaurant menu photo into personalized recommendations using computer vision, nutritional data, and multi-criteria optimization algorithms.**
 
-## Features
+*Eat smart, spend less.*
 
-### Core Functionality
-- **File Upload**: Upload PDF menus or multiple menu images
-- **OCR Processing**: Extract menu items, prices, and descriptions from uploaded files
-- **Nutritional Data Enhancement**: Automatically enrich menu items with nutritional information
-- **Multi-Objective Optimization**: Find optimal menu items based on customizable criteria
-- **Pareto Frontier Analysis**: Visualize trade-offs between different optimization objectives
+## 🚀 Features
 
-### Optimization Criteria
-- Protein per dollar
-- Calories per dollar
-- Health score (based on nutrition quality)
+### 🤖 AI-Powered Vision
+- **Gemini Pro Vision OCR**: Advanced computer vision for menu extraction from photos
+- **Smart Menu Analysis**: Understands complex menu layouts, fonts, and formatting
+- **Conversational AI**: Ask questions about menu items and get intelligent responses
+- **Camera Integration**: Real-time menu scanning with live camera feed
+
+### 🔬 Advanced Optimization
+- **Multi-Objective Optimization**: Weighted scoring and Pareto frontier analysis
+- **Nutritional Intelligence**: Automatic enrichment with comprehensive nutritional data
+- **Constraint Satisfaction**: Filter by budget, allergens, and dietary preferences
+- **Public Opinion Integration**: AI-powered sentiment analysis for menu items
+
+### 📊 Optimization Criteria
+- Protein per dollar ratio
+- Calories per dollar efficiency
+- Health score (nutritional quality)
+- Nutrient density optimization
 - Price minimization
-- Protein maximization
-- Fiber content
-- Nutrient density
+- Fiber, fat, carb, sodium optimization
+- Public opinion scoring
 
-### Advanced Features
-- **Fuzzy String Matching**: Match menu items with nutritional databases
-- **Web Scraping**: Extract nutritional data from restaurant websites
-- **Genetic Algorithm**: Advanced optimization for complex multi-constraint scenarios
-- **Interactive Charts**: Pareto frontier visualization with fl_chart
-- **Constraint Filtering**: Filter by price, allergens, and dietary restrictions
+### 🏗️ Advanced Features
+- **Clean Architecture**: Domain-driven design with proper separation of concerns
+- **MongoDB Integration**: Community-driven menu database with deduplication
+- **Auth0 Authentication**: Enterprise-grade secure user management
+- **Real-time Processing**: Efficient mobile optimization algorithms
+- **Interactive Visualizations**: Pareto frontier charts and detailed analytics
 
-## Architecture
+## 🏗️ Architecture
 
-### Models
-- `MenuItem`: Core data model with nutritional information
-- `OptimizationCriteria`: Defines optimization objectives and weights
-- `OptimizationResult`: Contains optimization scores and reasoning
+MenuMax follows **Clean Architecture** principles with clear separation of concerns:
 
-### Services
-- `OCRService`: Text extraction from menu images using Google ML Kit
-- `NutritionalDataService`: Data enrichment via APIs and web scraping
-- `OptimizationEngine`: Weighted multi-objective optimization algorithms
-- `MenuOptimizationService`: Main service orchestrating the optimization pipeline
+### 🎯 Domain Layer
+- `MenuItem`: Core business entity with nutritional calculations
+- `OptimizationCriteria`: Value objects defining optimization objectives
+- `OptimizationResult`: Results with scores and reasoning
+- `OptimizeMenuUseCase`: Business logic orchestration
 
-### UI Components
-- `FileUploadWidget`: Drag-and-drop file upload interface
-- `OptimizationFormWidget`: Criteria configuration and constraints
-- `ResultsDisplayWidget`: Rankings and Pareto frontier visualization
+### 📊 Data Layer
+- `GeminiVisionDataSource`: AI-powered menu OCR using Gemini Pro Vision
+- `NutritionDataSource`: Nutritional data enrichment APIs
+- `OptimizationDataSource`: Mathematical optimization algorithms
+- `MongoDBDataSource`: Community menu database
+- `Auth0DataSource`: User authentication
 
-## Algorithms
+### 🎨 Presentation Layer
+- `MenuOptimizationController`: State management with Provider
+- `CameraOCRWidget`: Live camera menu scanning
+- `FileUploadWidget`: Multi-format file upload
+- `OptimizationFormWidget`: Criteria and constraints configuration
+- `ResultsDisplayWidget`: Interactive charts and recommendations
 
-### Data Extraction
-- **OCR Pipeline**: Google ML Kit for menu text extraction
-- **NLP Processing**: Named Entity Recognition for food items and prices
-- **Pattern Matching**: Regex-based price and item identification
+### 🔧 Services
+- `OptimizationEngine`: Multi-criteria decision algorithms
+- `MoneySavingsService`: Cost analysis and tracking
+- `PublicOpinionService`: Sentiment analysis integration
+- `LocalStatsService`: User analytics and caching
 
-### Nutritional Data Enhancement
-- **API Integration**: USDA Food Data Central API
-- **Web Scraping**: Restaurant website nutritional information extraction
-- **Fuzzy Matching**: FuzzyWuzzy for menu item to database matching
-- **Fallback Hierarchy**: Restaurant site → Nutrition APIs → Generic databases
+## 🧠 AI & Algorithms
 
-### Optimization
-- **Weighted Scoring**: Multi-criteria decision analysis
+### 🤖 Computer Vision (Gemini Pro Vision)
+```dart
+final prompt = TextPart('''
+Analyze this menu image and extract ALL menu items with prices in JSON format.
+Return ONLY a JSON array: [{"name": "Item Name", "price": 5.99}]
+''');
+```
+- **Smart OCR**: Understands complex menu layouts and formatting
+- **Structured Extraction**: Converts images to structured JSON data
+- **Conversational AI**: Answer questions about menu content
+- **Fallback Parsing**: Regex-based extraction when JSON parsing fails
+
+### 🔬 Multi-Criteria Optimization
+```dart
+double _calculateOptimizationScore(MenuItem item, List<OptimizationCriteria> criteria) {
+  double totalScore = 0.0;
+  for (OptimizationCriteria criterion in criteria) {
+    double normalizedValue = _normalizeValue(_getCriterionValue(item, criterion.name));
+    totalScore += normalizedValue * criterion.weight;
+  }
+  return totalScore / totalWeight;
+}
+```
+- **Weighted Scoring**: Multi-criteria decision analysis (MCDA)
+- **Normalization**: 0-1 scaling across different value ranges
 - **Pareto Frontier**: Non-dominated solution identification
-- **Genetic Algorithm**: Population-based optimization for complex scenarios
-- **Constraint Handling**: Price, allergen, and dietary restriction filtering
+- **Constraint Satisfaction**: Budget, allergen, and dietary filtering
+
+### 📈 Data Enrichment
+- **Nutritional APIs**: Nutritionix and Edamam integration
+- **Fuzzy Matching**: String similarity for database matching
+- **Opinion Mining**: AI-powered sentiment analysis
+- **Caching Strategy**: Hash-based deduplication for performance
 
 ## Getting Started
 
@@ -84,25 +120,39 @@ flutter run
 ```
 
 ### Configuration
-- Replace `DEMO_KEY` in `nutritional_data_service.dart` with actual USDA API key
-- Configure web scraping targets in the nutritional service
-- Adjust optimization algorithm parameters in `optimization_engine.dart`
+```bash
+# Set environment variables for API keys
+flutter run --dart-define=GEMINI_API_KEY=your_gemini_key
+flutter run --dart-define=NUTRITIONIX_API_KEY=your_nutritionix_key
+flutter run --dart-define=MONGODB_URI=your_mongodb_connection
+```
 
-## Usage
+- **Gemini API**: Computer vision for menu OCR
+- **Nutritionix API**: Nutritional data enrichment
+- **MongoDB Atlas**: Community menu database
+- **Auth0**: User authentication (configure domain/client ID)
 
-1. **Upload Menu Files**: Select PDF or image files of restaurant menus
-2. **Set Restaurant Info** (Optional): Enter restaurant name, location, and website
-3. **Configure Optimization**:
-   - Add optimization criteria (protein/dollar, health score, etc.)
-   - Set weights for each criterion
-   - Choose maximize or minimize for each objective
-   - Set constraints (max price, allergen restrictions)
-4. **Run Analysis**: Process files and view optimized recommendations
-5. **View Results**:
-   - Ranked list of optimal menu items
-   - Detailed nutritional breakdown
-   - Pareto frontier visualization
-   - Optimization reasoning
+## 📱 Usage
+
+### 📸 Quick Start
+1. **Scan Menu**: Use camera to capture menu or upload image/PDF
+2. **AI Processing**: Gemini Vision extracts items automatically
+3. **Set Preferences**: Choose optimization goals (health, budget, protein, etc.)
+4. **Get Recommendations**: View ranked results with detailed reasoning
+
+### 🎯 Advanced Features
+1. **Multi-Criteria Optimization**:
+   - Weight different goals (50% health, 30% budget, 20% taste)
+   - Set hard constraints (under $15, no nuts, high protein)
+   - View Pareto frontier for trade-off analysis
+
+2. **AI Conversations**:
+   - Ask: "What's the healthiest option under $12?"
+   - Get: Intelligent responses based on menu analysis
+
+3. **Community Intelligence**:
+   - Benefit from shared menu database
+   - Contribute to collective optimization knowledge
 
 ## Technical Implementation
 
@@ -118,17 +168,88 @@ The app uses a weighted sum approach where each criterion is:
 - Visualizes trade-offs between competing criteria
 - Helps users understand optimization constraints
 
-## Dependencies
+## 📦 Dependencies
 
-Key Flutter packages used:
-- `google_ml_kit`: OCR and text recognition
-- `file_picker`: File upload functionality
-- `fl_chart`: Data visualization
-- `fuzzywuzzy`: String matching
-- `http`/`dio`: API calls and web scraping
-- `provider`: State management
-- `json_annotation`: Data serialization
+### 🤖 AI & Vision
+- `google_generative_ai`: Gemini Pro Vision API integration
+- `camera`: Real-time menu scanning
+- `google_ml_kit`: Fallback OCR processing
 
-## License
+### 🗄️ Backend & Data
+- `mongo_dart`: MongoDB Atlas integration
+- `auth0_flutter`: Enterprise authentication
+- `http`/`dio`: API communication
+- `crypto`: Data hashing and security
 
-This project is created for educational purposes as part of PennApps 2025.
+### 📊 UI & Visualization
+- `fl_chart`: Interactive Pareto frontier charts
+- `provider`: Reactive state management
+- `file_picker`: Multi-format file upload
+- `syncfusion_flutter_pdf`: PDF processing
+
+### 🔧 Utilities
+- `fuzzywuzzy`: Intelligent string matching
+- `json_annotation`: Type-safe serialization
+- `shared_preferences`: Local data persistence
+- `vector_math`: Mathematical computations
+
+## 🏆 Technical Achievements
+
+### 🤖 Advanced AI Integration
+- **Gemini Pro Vision**: State-of-the-art computer vision for menu understanding
+- **Prompt Engineering**: Sophisticated prompts for reliable structured data extraction
+- **Conversational AI**: Natural language interaction with menu content
+
+### 🧮 Mathematical Rigor
+- **Multi-Objective Optimization**: Implements weighted MCDA with Pareto analysis
+- **Normalization Algorithms**: Robust scaling across diverse value ranges
+- **Constraint Satisfaction**: Complex filtering with multiple simultaneous constraints
+
+### 🏗️ Software Engineering Excellence
+- **Clean Architecture**: Proper separation of domain, data, and presentation layers
+- **SOLID Principles**: Maintainable, testable, and extensible codebase
+- **Type Safety**: Comprehensive use of Dart's type system with code generation
+
+### 🚀 Performance & Scalability
+- **Mobile Optimization**: Efficient algorithms designed for mobile constraints
+- **Intelligent Caching**: Hash-based deduplication and opinion score caching
+- **Asynchronous Processing**: Non-blocking UI with concurrent API calls
+
+### 🌐 Real-World Integration
+- **Enterprise Auth**: Auth0 integration for production-ready authentication
+- **Cloud Database**: MongoDB Atlas for scalable community data
+- **API Orchestration**: Multiple external services (Nutritionix, Edamam, Gemini)
+
+## 📊 Code Statistics
+
+```dart
+// Core algorithm example - Multi-criteria optimization
+Future<ParetoFrontier> optimize(List<MenuItem> items, OptimizationRequest request) async {
+  List<OptimizationResult> results = [];
+
+  for (MenuItem item in items) {
+    if (!_passesFilters(item, request)) continue;
+
+    double score = _calculateOptimizationScore(item, request.criteria);
+    Map<String, double> criteriaScores = _calculateCriteriaScores(item, request.criteria);
+    String reasoning = _generateReasoning(item, request.criteria, criteriaScores);
+
+    results.add(OptimizationResult(
+      menuItem: item,
+      optimizationScore: score,
+      criteriaScores: criteriaScores,
+      reasoning: reasoning,
+    ));
+  }
+
+  return ParetoFrontier(results: results.sorted(), frontierPoints: _calculateParetoFrontier(results));
+}
+```
+
+## 🎯 Impact & Innovation
+
+**MenuMax** represents a convergence of cutting-edge AI, mathematical optimization, and mobile engineering to solve a real-world problem that affects millions of people daily. By combining computer vision, multi-criteria decision analysis, and community intelligence, we've created a tool that doesn't just recommend food—it empowers users to make mathematically optimal decisions aligned with their personal goals.
+
+## 📄 License
+
+This project was created for **PennApps 2025** and demonstrates advanced integration of generative AI, optimization algorithms, and mobile development best practices.
